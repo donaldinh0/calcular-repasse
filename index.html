@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Repasse</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="container">
+        <div class="calculator-card">
+            <header class="card-header">
+                <h1>Simulador de Repasse</h1>
+                <p>Calcule o valor líquido a receber após taxas e impostos.</p>
+            </header>
+
+            <section class="input-section">
+                <div class="toggle-container">
+                    <span class="toggle-label">Tipo de Contrato:</span>
+                    <div class="toggle-switch">
+                        <input type="radio" id="type-pj" name="contract-type" value="PJ" checked>
+                        <label for="type-pj" class="toggle-btn">PJ</label>
+                        
+                        <input type="radio" id="type-pf" name="contract-type" value="PF">
+                        <label for="type-pf" class="toggle-btn">PF</label>
+                        <div class="toggle-marker"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="lucroBruto">Lucro Bruto do Trader</label>
+                    <div class="currency-wrapper">
+                        <span class="currency-symbol">R$</span>
+                        <input type="number" id="lucroBruto" placeholder="0,00" step="0.01" min="0">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="saldoDevedor">Saldo Devedor (Opcional)</label>
+                    <div class="currency-wrapper negative-hint">
+                        <span class="currency-symbol">R$</span>
+                        <input type="number" id="saldoDevedor" placeholder="0,00" step="0.01" min="0">
+                    </div>
+                    <small>Valor que o trader deve à mesa, se houver.</small>
+                </div>
+
+                <button id="btnCalcular" class="cta-button">Calcular Repasse</button>
+            </section>
+
+            <section id="resultsSection" class="results-section hidden">
+                <div class="separator"></div>
+                <h2>Extrato do Repasse</h2>
+                
+                <ul id="statementList" class="statement-list">
+                   </ul>
+
+                <div class="final-result">
+                    <span class="result-label">Valor Líquido a Receber:</span>
+                    <span id="finalAmount" class="result-value">R$ 0,00</span>
+                </div>
+                <div id="debtAlert" class="debt-alert hidden">
+                    Atenção: O trader permanece com saldo negativo com a mesa.
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
