@@ -1,22 +1,10 @@
-// --- Configurações e Taxas ---
+// --- Taxas Configuráveis ---
 const TAXAS = {
-    PJ: {
-        ir: 0.20,
-        mesa: 0.10
-    },
-    PF: {
-        ir: 0.20,
-        mesa: 0.10,
-        rpa: 0.11,
-        iss: 0.05
-    }
+    PJ: { ir: 0.20, mesa: 0.10 },
+    PF: { ir: 0.20, mesa: 0.10, rpa: 0.11, iss: 0.05 }
 };
 
-// --- Funções Utilitárias ---
-
-/**
- * Formata um número para o padrão monetário brasileiro (R$).
- */
+// --- Formatadores ---
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', {
         style: 'currency',
@@ -24,94 +12,99 @@ function formatarMoeda(valor) {
     }).format(valor);
 }
 
-/**
- * Lê e limpa os valores dos inputs numéricos.
- */
 function getInputValue(id) {
     const value = document.getElementById(id).value;
-    // Se estiver vazio ou não for número, retorna 0, senão converte para float
     return value ? parseFloat(value) : 0;
 }
 
-// --- Lógica de Cálculo ---
+// --- Lógica Principal (Cascata) ---
 function calcularResultado() {
-    // 1. Obter dados da interface
-    const lucroBruto = getInputValue('lucroBruto');
+    // 1. Entradas
+    let baseCalculo = getInputValue('lucroLiquido'); // Começa com o Lucro Líquido inserido
     const saldoDevedor = getInputValue('saldoDevedor');
-    // Pega qual radio button está marcado (PJ ou PF)
     const tipoContrato = document.querySelector('input[name="contract-type"]:checked').value;
-
-    // Validação básica
-    if (lucroBruto <= 0) {
-        alert("Por favor, insira um Lucro Bruto válido.");
-        return;
-    }
-
+    
+    // Variáveis de controle
     const taxasAtuais = TAXAS[tipoContrato];
     let detalhesExtrato = [];
-    let totalDescontos = 0;
+    
+    // Adiciona linha inicial
+    detalhesExtrato.push({ label: "Entrada (Lucro Líquido)", valor: baseCalculo, tipo: "bruto" });
 
-    // 2. Adiciona o Lucro Bruto ao extrato
-    detalhesExtrato.push({
-        label: "Lucro Bruto",
-        valor: lucroBruto,
-        tipo: "bruto"
+    // --- PASSO 1: Imposto de Renda (20% sobre a entrada) ---
+    // Nota: O cálculo é sobre o valor cheio, mas subtraído do montante.
+    const valorIR = baseCalculo * taxasAtuais.ir;
+    baseCalculo -= valorIR; // Atualiza o saldo
+    detalhesExtrato.push({ 
+        label: `(-) Imposto de Renda (20%)`, 
+        valor: -valorIR, 
+        tipo: "desconto" 
     });
 
-    // 3. Cálculos das taxas (baseadas no Bruto)
-    // A ordem aqui segue o seu pedido: IR, Mesa, Devedor, RPA, ISS
+    // --- PASSO 2: Lucro da Mesa (10% sobre o que sobrou do IR) ---
+    const valorMesa = baseCalculo * taxasAtuais.mesa;
+    baseCalculo -= valorMesa; // Atualiza o saldo
+    detalhesExtrato.push({ 
+        label: `(-) Lucro da Mesa (10% do restante)`, 
+        valor: -valorMesa, 
+        tipo: "desconto" 
+    });
 
-    // IR
-    const valorIR = lucroBruto * taxasAtuais.ir;
-    detalhesExtrato.push({ label: `Imposto de Renda (${taxasAtuais.ir * 100}%)`, valor: -valorIR, tipo: "desconto" });
-    totalDescontos += valorIR;
+    // Subtotal para visualização (Lucro do Trader antes da dívida)
+    // Se quiser mostrar essa linha, descomente abaixo:
+    // detalhesExtrato.push({ label: "Subtotal (Trader)", valor: baseCalculo, tipo: "neutro" });
 
-    // Mesa
-    const valorMesa = lucroBruto * taxasAtuais.mesa;
-    detalhesExtrato.push({ label: `Lucro da Mesa (${taxasAtuais.mesa * 100}%)`, valor: -valorMesa, tipo: "desconto" });
-    totalDescontos += valorMesa;
-
-    // Saldo Devedor
+    // --- PASSO 3: Saldo Devedor ---
     if (saldoDevedor > 0) {
-        detalhesExtrato.push({ label: "Abatimento Saldo Devedor", valor: -saldoDevedor, tipo: "desconto" });
-        totalDescontos += saldoDevedor;
+        baseCalculo -= saldoDevedor;
+        detalhesExtrato.push({ 
+            label: "(-) Abatimento Saldo Devedor", 
+            valor: -saldoDevedor, 
+            tipo: "desconto" 
+        });
     }
 
-    // Taxas específicas de PF
+    // --- PASSO 4: Taxas PF (RPA e ISS) sobre o SALDO FINAL ---
+    // A lógica aqui segue sua ordem: desconta sobre o valor que sobrou (mesmo se for negativo)
     if (tipoContrato === 'PF') {
-        const valorRPA = lucroBruto * taxasAtuais.rpa;
-        detalhesExtrato.push({ label: `RPA (${taxasAtuais.rpa * 100}%)`, valor: -valorRPA, tipo: "desconto" });
-        totalDescontos += valorRPA;
+        // Usamos Math.abs() para calcular a taxa sobre o tamanho do valor, 
+        // mas subtraímos para descontar.
+        const baseParaTaxas = Math.abs(baseCalculo); 
 
-        const valorISS = lucroBruto * taxasAtuais.iss;
-        detalhesExtrato.push({ label: `ISS (${taxasAtuais.iss * 100}%)`, valor: -valorISS, tipo: "desconto" });
-        totalDescontos += valorISS;
+        const valorRPA = baseParaTaxas * taxasAtuais.rpa;
+        baseCalculo -= valorRPA;
+        detalhesExtrato.push({ 
+            label: `(-) RPA (11% do saldo)`, 
+            valor: -valorRPA, 
+            tipo: "desconto" 
+        });
+
+        const valorISS = baseParaTaxas * taxasAtuais.iss;
+        baseCalculo -= valorISS;
+        detalhesExtrato.push({ 
+            label: `(-) ISS (5% do saldo)`, 
+            valor: -valorISS, 
+            tipo: "desconto" 
+        });
     }
 
-    // 4. Cálculo Final
-    const valorLiquido = lucroBruto - totalDescontos;
-
-    // 5. Atualizar a Interface
-    renderizarResultados(detalhesExtrato, valorLiquido);
+    // 5. Renderizar
+    renderizarResultados(detalhesExtrato, baseCalculo);
 }
 
-// --- Manipulação do DOM (Interface) ---
-function renderizarResultados(extrato, valorLiquidoFinal) {
+// --- Interface ---
+function renderizarResultados(extrato, valorFinal) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
     const finalAmountEl = document.getElementById('finalAmount');
     const finalResultCard = document.querySelector('.final-result');
     const debtAlert = document.getElementById('debtAlert');
 
-    // Limpa lista anterior
     statementList.innerHTML = '';
 
-    // Gera o HTML de cada linha do extrato
     extrato.forEach(item => {
         const li = document.createElement('li');
-        // Adiciona classes CSS dependendo se é valor bruto ou desconto
         li.className = `statement-item is-${item.tipo}`;
-        
         li.innerHTML = `
             <span class="item-label">${item.label}</span>
             <span class="item-value">${formatarMoeda(item.valor)}</span>
@@ -119,17 +112,13 @@ function renderizarResultados(extrato, valorLiquidoFinal) {
         statementList.appendChild(li);
     });
 
-    // Atualiza o valor final grande
-    finalAmountEl.textContent = formatarMoeda(valorLiquidoFinal);
-
-    // Mostra a área de resultados com animação simples (removendo 'hidden')
+    finalAmountEl.textContent = formatarMoeda(valorFinal);
     resultsSection.classList.remove('hidden');
 
-    // Lógica visual para saldo negativo
-    if (valorLiquidoFinal < 0) {
+    if (valorFinal < 0) {
         finalResultCard.classList.add('negative-balance');
         debtAlert.classList.remove('hidden');
-        document.querySelector('.result-label').textContent = "Saldo Devedor Remanescente:";
+        document.querySelector('.result-label').textContent = "Saldo Devedor Final:";
     } else {
         finalResultCard.classList.remove('negative-balance');
         debtAlert.classList.add('hidden');
@@ -137,20 +126,11 @@ function renderizarResultados(extrato, valorLiquidoFinal) {
     }
 }
 
-// --- Event Listeners ---
-// Espera o HTML carregar para conectar o botão
 document.addEventListener('DOMContentLoaded', () => {
-    const btnCalcular = document.getElementById('btnCalcular');
-    if (btnCalcular) {
-        btnCalcular.addEventListener('click', calcularResultado);
-    }
-
-    // Opcional: Permitir calcular apertando "Enter" nos inputs
-    ['lucroBruto', 'saldoDevedor'].forEach(id => {
-        document.getElementById(id).addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                calcularResultado();
-            }
+    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
+    ['lucroLiquido', 'saldoDevedor'].forEach(id => {
+        document.getElementById(id).addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') calcularResultado();
         });
     });
 });

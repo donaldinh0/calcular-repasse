@@ -15,7 +15,7 @@
         <div class="calculator-card">
             <header class="card-header">
                 <h1>Simulador de Repasse</h1>
-                <p>Calcule o valor líquido a receber após taxas e impostos.</p>
+                <p>Cálculo em cascata (IR > Mesa > Dívida > Taxas).</p>
             </header>
 
             <section class="input-section">
@@ -32,10 +32,10 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="lucroBruto">Lucro Bruto do Trader</label>
+                    <label for="lucroLiquido">Lucro Líquido (Trader)</label>
                     <div class="currency-wrapper">
                         <span class="currency-symbol">R$</span>
-                        <input type="number" id="lucroBruto" placeholder="0,00" step="0.01" min="0">
+                        <input type="number" id="lucroLiquido" placeholder="0,00" step="0.01">
                     </div>
                 </div>
 
@@ -59,11 +59,11 @@
                    </ul>
 
                 <div class="final-result">
-                    <span class="result-label">Valor Líquido a Receber:</span>
+                    <span class="result-label">Valor Final:</span>
                     <span id="finalAmount" class="result-value">R$ 0,00</span>
                 </div>
                 <div id="debtAlert" class="debt-alert hidden">
-                    Atenção: O trader permanece com saldo negativo com a mesa.
+                    Atenção: O saldo final é negativo (Devedor).
                 </div>
             </section>
         </div>
