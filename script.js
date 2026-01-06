@@ -16,10 +16,13 @@ function getInputValue(id) {
 
 // Função principal de cálculo
 function calcularResultado() {
-    // Entradas
+    // 1. Pega os valores
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
-    const usaRPA = document.getElementById('checkRPA').checked;
+    
+    // 2. Verifica se o botão de RPA está ligado ou desligado
+    const checkRPA = document.getElementById('checkRPA');
+    const usaRPA = checkRPA.checked; 
     
     // Lista para montagem do HTML
     let extratoHTML = '';
@@ -29,7 +32,7 @@ function calcularResultado() {
 
     // --- Passo 2: IR (20%) ---
     const valorIR = valorAtual * TAXAS.ir;
-    valorAtual -= valorIR; // Subtrai
+    valorAtual -= valorIR; 
     extratoHTML += criarLinha("(-) Imposto de Renda (20%)", -valorIR, "desconto");
     
     // Subtotal 1
@@ -37,7 +40,7 @@ function calcularResultado() {
 
     // --- Passo 3: Mesa (10% sobre o restante) ---
     const valorMesa = valorAtual * TAXAS.mesa;
-    valorAtual -= valorMesa; // Subtrai
+    valorAtual -= valorMesa; 
     extratoHTML += criarLinha("(-) Lucro da Mesa (10%)", -valorMesa, "desconto");
 
     // Subtotal 2 (Lucro do Trader)
@@ -49,32 +52,32 @@ function calcularResultado() {
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // --- Passo 5: RPA (Se a caixa estiver marcada) ---
+    // --- Passo 5: RPA (SÓ ENTRA AQUI SE O BOTÃO ESTIVER LIGADO) ---
     if (usaRPA) {
-        // Lógica "Opção B": Desconta a taxa sobre o valor absoluto e reduz visualmente a dívida (ou lucro)
+        // Lógica Visual: Abate as taxas do valor absoluto para "reduzir" a dívida visualmente
         const valorAbsoluto = Math.abs(valorAtual);
         
         const valorRPA = valorAbsoluto * TAXAS.rpa;
         const valorISS = valorAbsoluto * TAXAS.iss;
         const totalTaxasRPA = valorRPA + valorISS;
 
-        // Se o valorAtual for positivo, subtrai as taxas (ganha menos)
-        // Se o valorAtual for negativo, "soma" as taxas (reduz a magnitude da dívida visualmente conforme seu pedido)
         if (valorAtual >= 0) {
+            // Se for lucro, desconta normal
             valorAtual -= totalTaxasRPA;
         } else {
-            valorAtual += totalTaxasRPA; // -7000 + 1000 = -6000
+            // Se for dívida, "soma" para reduzir o tamanho da dívida (ex: -7000 vai para -6000)
+            valorAtual += totalTaxasRPA; 
         }
         
         extratoHTML += criarLinha("(-) Desconto RPA (11%)", -valorRPA, "desconto");
         extratoHTML += criarLinha("(-) Desconto ISS (5%)", -valorISS, "desconto");
     }
 
-    // Renderizar
+    // Renderizar na tela
     renderizar(extratoHTML, valorAtual, usaRPA);
 }
 
-// Função auxiliar para criar o HTML da linha
+// Cria o HTML da linha
 function criarLinha(label, valor, tipo) {
     return `
         <li class="statement-item item-${tipo}">
@@ -94,14 +97,14 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
     statementList.innerHTML = htmlLista;
     valorFinalDisplay.textContent = formatarMoeda(valorFinal);
     
-    // Atualiza cor do card final
+    // Cor do card final
     if (valorFinal >= 0) {
         finalCard.className = 'final-result-card text-green';
     } else {
         finalCard.className = 'final-result-card text-red';
     }
 
-    // Mostra/Oculta dica de RPA
+    // Texto explicativo "Com descontos de RPA..."
     if (usaRPA) rpaHint.classList.remove('hidden');
     else rpaHint.classList.add('hidden');
 
@@ -110,13 +113,20 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    
+    // Garante que o RPA comece desligado ao atualizar a página
+    const checkRPA = document.getElementById('checkRPA');
+    if(checkRPA) checkRPA.checked = false;
+
     // Botão Calcular
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
     
-    // Switch RPA (Recalcula na hora se mudar)
-    document.getElementById('checkRPA').addEventListener('change', () => {
-        const sectionVisible = !document.getElementById('resultsSection').classList.contains('hidden');
-        if (sectionVisible) calcularResultado();
+    // Quando clicar no botão "Emite RPA?", recalcula na hora
+    checkRPA.addEventListener('change', () => {
+        // Só calcula se a área de resultados já estiver visível
+        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
+            calcularResultado();
+        }
     });
 
     // Enter nos inputs
