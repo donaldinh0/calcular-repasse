@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Repasse</title>
+    <title>Calculadora do Trader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,28 +14,16 @@
     <main class="container">
         <div class="calculator-card">
             <header class="card-header">
-                <h1>Simulador de Repasse</h1>
-                <p>Cálculo em cascata (IR > Mesa > Dívida > Taxas).</p>
+                <h1>Calculadora de Repasse</h1>
+                <p>Simule seus ganhos detalhadamente.</p>
             </header>
 
             <section class="input-section">
-                <div class="toggle-container">
-                    <span class="toggle-label">Tipo de Contrato:</span>
-                    <div class="toggle-switch">
-                        <input type="radio" id="type-pj" name="contract-type" value="PJ" checked>
-                        <label for="type-pj" class="toggle-btn">PJ</label>
-                        
-                        <input type="radio" id="type-pf" name="contract-type" value="PF">
-                        <label for="type-pf" class="toggle-btn">PF</label>
-                        <div class="toggle-marker"></div>
-                    </div>
-                </div>
-
                 <div class="input-group">
-                    <label for="lucroLiquido">Lucro Líquido (Trader)</label>
+                    <label for="resultadoMensal">Resultado Mensal</label>
                     <div class="currency-wrapper">
                         <span class="currency-symbol">R$</span>
-                        <input type="number" id="lucroLiquido" placeholder="0,00" step="0.01">
+                        <input type="text" id="resultadoMensal" class="money-input" placeholder="0,00" inputmode="numeric">
                     </div>
                 </div>
 
@@ -43,28 +31,47 @@
                     <label for="saldoDevedor">Saldo Devedor (Opcional)</label>
                     <div class="currency-wrapper negative-hint">
                         <span class="currency-symbol">R$</span>
-                        <input type="number" id="saldoDevedor" placeholder="0,00" step="0.01" min="0">
+                        <input type="text" id="saldoDevedor" class="money-input" placeholder="0,00" inputmode="numeric">
                     </div>
-                    <small>Valor que o trader deve à mesa, se houver.</small>
                 </div>
 
-                <button id="btnCalcular" class="cta-button">Calcular Repasse</button>
+                <button id="btnCalcular" class="cta-button">Calcular</button>
             </section>
 
             <section id="resultsSection" class="results-section hidden">
                 <div class="separator"></div>
-                <h2>Extrato do Repasse</h2>
+                
+                <div class="results-header">
+                    <h2>Demonstrativo</h2>
+                    
+                    <div class="rpa-toggle-wrapper">
+                        <div class="toggle-group">
+                            <label class="switch">
+                                <input type="checkbox" id="checkRPA">
+                                <span class="slider round"></span>
+                            </label>
+                            <span class="toggle-label">Emite RPA?</span>
+                        </div>
+
+                        <div class="tooltip-container">
+                            <span class="help-icon" id="btnHelp">?</span>
+                            <div class="tooltip-text">
+                                O RPA (Recibo de Pagamento Autônomo) é um documento fiscal que formaliza pagamentos a pessoas físicas (autônomos) por serviços prestados a empresas ou outras pessoas físicas, sem vínculo empregatício, funcionando como uma nota fiscal para quem não tem CNPJ, sendo o contratante responsável por emitir, calcular e recolher tributos como INSS e IRRF. Ele detalha os dados das partes, o serviço, valores brutos, descontos (INSS, IRRF, ISS) e o valor líquido a ser pago, sendo essencial para comprovar a transação e o recolhimento fiscal.
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 
                 <ul id="statementList" class="statement-list">
                    </ul>
 
-                <div class="final-result">
-                    <span class="result-label">Valor Final:</span>
-                    <span id="finalAmount" class="result-value">R$ 0,00</span>
+                <div class="final-result-card">
+                    <span id="labelResultado" class="final-label">Valor a Receber</span>
+                    
+                    <strong id="valorFinalDisplay">R$ 0,00</strong>
+                    <small id="rpaHint">(Sem descontos de RPA e ISS aplicados)</small>
                 </div>
-                <div id="debtAlert" class="debt-alert hidden">
-                    Atenção: O saldo final é negativo (Devedor).
-                </div>
+
             </section>
         </div>
     </main>

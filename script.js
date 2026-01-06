@@ -1,136 +1,178 @@
-// --- Taxas Configuráveis ---
 const TAXAS = {
-    PJ: { ir: 0.20, mesa: 0.10 },
-    PF: { ir: 0.20, mesa: 0.10, rpa: 0.11, iss: 0.05 }
+    ir: 0.20,
+    mesa: 0.10,
+    rpa: 0.11,
+    iss: 0.05
 };
 
-// --- Formatadores ---
+// --- Funções de Formatação (Máscara) ---
+
 function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(valor);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 
+// Essa função formata o campo ENQUANTO você digita
+function aplicarMascaraMoeda(event) {
+    const input = event.target;
+    let valor = input.value;
+    
+    // 1. Remove tudo que não for número
+    valor = valor.replace(/\D/g, "");
+    
+    // 2. Se estiver vazio, limpa
+    if (valor === "") {
+        input.value = "";
+        return;
+    }
+
+    // 3. Converte para número (considerando centavos) e formata
+    // Ex: digita 30000 -> vira 300.00 -> formata para 300,00
+    // Ex: digita 3000000 -> vira 30000.00 -> formata para 30.000,00
+    valor = (parseInt(valor) / 100).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    input.value = valor;
+}
+
+// Função para ler o valor formatado e converter para número de cálculo
 function getInputValue(id) {
     const value = document.getElementById(id).value;
-    return value ? parseFloat(value) : 0;
+    if (!value) return 0;
+
+    // Remove pontos de milhar e troca vírgula por ponto decimal
+    // Ex: "30.000,00" -> "30000.00"
+    const numeroLimpo = value.replace(/\./g, "").replace(",", ".");
+    return parseFloat(numeroLimpo);
 }
 
-// --- Lógica Principal (Cascata) ---
+// --- Lógica de Cálculo (Mantida igual) ---
 function calcularResultado() {
-    // 1. Entradas
-    let baseCalculo = getInputValue('lucroLiquido'); // Começa com o Lucro Líquido inserido
+    let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
-    const tipoContrato = document.querySelector('input[name="contract-type"]:checked').value;
+    const checkRPA = document.getElementById('checkRPA');
+    const usaRPA = checkRPA.checked; 
     
-    // Variáveis de controle
-    const taxasAtuais = TAXAS[tipoContrato];
-    let detalhesExtrato = [];
+    let extratoHTML = '';
+
+    // 1. Mensal
+    extratoHTML += criarLinha("Resultado Mensal", valorAtual, "bruto");
+
+    // 2. IR
+    const valorIR = valorAtual * TAXAS.ir;
+    valorAtual -= valorIR; 
+    extratoHTML += criarLinha("(-) Imposto de Renda (20%)", -valorIR, "desconto");
     
-    // Adiciona linha inicial
-    detalhesExtrato.push({ label: "Entrada (Lucro Líquido)", valor: baseCalculo, tipo: "bruto" });
+    // Subtotal 1
+    extratoHTML += criarLinha("Resultado após IR", valorAtual, "subtotal");
 
-    // --- PASSO 1: Imposto de Renda (20% sobre a entrada) ---
-    // Nota: O cálculo é sobre o valor cheio, mas subtraído do montante.
-    const valorIR = baseCalculo * taxasAtuais.ir;
-    baseCalculo -= valorIR; // Atualiza o saldo
-    detalhesExtrato.push({ 
-        label: `(-) Imposto de Renda (20%)`, 
-        valor: -valorIR, 
-        tipo: "desconto" 
-    });
+    // 3. Mesa
+    const valorMesa = valorAtual * TAXAS.mesa;
+    valorAtual -= valorMesa; 
+    extratoHTML += criarLinha("(-) Lucro da Mesa (10%)", -valorMesa, "desconto");
 
-    // --- PASSO 2: Lucro da Mesa (10% sobre o que sobrou do IR) ---
-    const valorMesa = baseCalculo * taxasAtuais.mesa;
-    baseCalculo -= valorMesa; // Atualiza o saldo
-    detalhesExtrato.push({ 
-        label: `(-) Lucro da Mesa (10% do restante)`, 
-        valor: -valorMesa, 
-        tipo: "desconto" 
-    });
+    // Subtotal 2 (Lucro do Trader)
+    extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // Subtotal para visualização (Lucro do Trader antes da dívida)
-    // Se quiser mostrar essa linha, descomente abaixo:
-    // detalhesExtrato.push({ label: "Subtotal (Trader)", valor: baseCalculo, tipo: "neutro" });
-
-    // --- PASSO 3: Saldo Devedor ---
+    // 4. Dívida
     if (saldoDevedor > 0) {
-        baseCalculo -= saldoDevedor;
-        detalhesExtrato.push({ 
-            label: "(-) Abatimento Saldo Devedor", 
-            valor: -saldoDevedor, 
-            tipo: "desconto" 
-        });
+        valorAtual -= saldoDevedor;
+        extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // --- PASSO 4: Taxas PF (RPA e ISS) sobre o SALDO FINAL ---
-    // A lógica aqui segue sua ordem: desconta sobre o valor que sobrou (mesmo se for negativo)
-    if (tipoContrato === 'PF') {
-        // Usamos Math.abs() para calcular a taxa sobre o tamanho do valor, 
-        // mas subtraímos para descontar.
-        const baseParaTaxas = Math.abs(baseCalculo); 
+    // 5. RPA
+    if (usaRPA) {
+        const valorAbsoluto = Math.abs(valorAtual);
+        const valorRPA = valorAbsoluto * TAXAS.rpa;
+        const valorISS = valorAbsoluto * TAXAS.iss;
+        const totalTaxasRPA = valorRPA + valorISS;
 
-        const valorRPA = baseParaTaxas * taxasAtuais.rpa;
-        baseCalculo -= valorRPA;
-        detalhesExtrato.push({ 
-            label: `(-) RPA (11% do saldo)`, 
-            valor: -valorRPA, 
-            tipo: "desconto" 
-        });
-
-        const valorISS = baseParaTaxas * taxasAtuais.iss;
-        baseCalculo -= valorISS;
-        detalhesExtrato.push({ 
-            label: `(-) ISS (5% do saldo)`, 
-            valor: -valorISS, 
-            tipo: "desconto" 
-        });
+        if (valorAtual >= 0) {
+            valorAtual -= totalTaxasRPA;
+        } else {
+            valorAtual += totalTaxasRPA; 
+        }
+        
+        extratoHTML += criarLinha("(-) Desconto RPA (11%)", -valorRPA, "desconto");
+        extratoHTML += criarLinha("(-) Desconto ISS (5%)", -valorISS, "desconto");
     }
 
-    // 5. Renderizar
-    renderizarResultados(detalhesExtrato, baseCalculo);
+    renderizar(extratoHTML, valorAtual, usaRPA);
 }
 
-// --- Interface ---
-function renderizarResultados(extrato, valorFinal) {
+function criarLinha(label, valor, tipo) {
+    return `
+        <li class="statement-item item-${tipo}">
+            <span class="item-label">${label}</span>
+            <span class="item-value">${formatarMoeda(valor)}</span>
+        </li>
+    `;
+}
+
+function renderizar(htmlLista, valorFinal, usaRPA) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
-    const finalAmountEl = document.getElementById('finalAmount');
-    const finalResultCard = document.querySelector('.final-result');
-    const debtAlert = document.getElementById('debtAlert');
+    const valorFinalDisplay = document.getElementById('valorFinalDisplay');
+    const finalCard = document.querySelector('.final-result-card');
+    const labelResultado = document.getElementById('labelResultado');
+    const rpaHint = document.getElementById('rpaHint');
 
-    statementList.innerHTML = '';
-
-    extrato.forEach(item => {
-        const li = document.createElement('li');
-        li.className = `statement-item is-${item.tipo}`;
-        li.innerHTML = `
-            <span class="item-label">${item.label}</span>
-            <span class="item-value">${formatarMoeda(item.valor)}</span>
-        `;
-        statementList.appendChild(li);
-    });
-
-    finalAmountEl.textContent = formatarMoeda(valorFinal);
-    resultsSection.classList.remove('hidden');
-
-    if (valorFinal < 0) {
-        finalResultCard.classList.add('negative-balance');
-        debtAlert.classList.remove('hidden');
-        document.querySelector('.result-label').textContent = "Saldo Devedor Final:";
+    statementList.innerHTML = htmlLista;
+    valorFinalDisplay.textContent = formatarMoeda(valorFinal);
+    
+    if (valorFinal >= 0) {
+        finalCard.className = 'final-result-card text-green';
+        labelResultado.textContent = "Valor a Receber";
     } else {
-        finalResultCard.classList.remove('negative-balance');
-        debtAlert.classList.add('hidden');
-        document.querySelector('.result-label').textContent = "Valor Líquido a Receber:";
+        finalCard.className = 'final-result-card text-red';
+        labelResultado.textContent = "Seu saldo devedor atual é de:";
     }
+
+    rpaHint.classList.remove('hidden'); 
+    if (usaRPA) {
+        rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
+    } else {
+        rpaHint.textContent = "(Sem descontos de RPA e ISS aplicados)";
+    }
+
+    resultsSection.classList.remove('hidden');
 }
 
+// --- Inicialização ---
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    ['lucroLiquido', 'saldoDevedor'].forEach(id => {
-        document.getElementById(id).addEventListener('keypress', (e) => {
+    const checkRPA = document.getElementById('checkRPA');
+    if(checkRPA) checkRPA.checked = false;
+
+    // 1. Aplica a máscara nos campos enquanto digita
+    const inputsMoeda = document.querySelectorAll('.money-input');
+    inputsMoeda.forEach(input => {
+        input.addEventListener('input', aplicarMascaraMoeda);
+        
+        // Permite calcular apertando Enter
+        input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
         });
+    });
+
+    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
+    
+    checkRPA.addEventListener('change', () => {
+        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
+            calcularResultado();
+        }
+    });
+
+    // Tooltip Mobile
+    const btnHelp = document.getElementById('btnHelp');
+    const tooltipText = document.querySelector('.tooltip-text');
+
+    btnHelp.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        tooltipText.classList.toggle('show-tooltip');
+    });
+
+    document.addEventListener('click', () => {
+        tooltipText.classList.remove('show-tooltip');
     });
 });
