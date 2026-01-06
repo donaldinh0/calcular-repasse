@@ -20,7 +20,7 @@ function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
     
-    // 2. Verifica se o botão de RPA está ligado ou desligado
+    // 2. Verifica RPA
     const checkRPA = document.getElementById('checkRPA');
     const usaRPA = checkRPA.checked; 
     
@@ -52,9 +52,8 @@ function calcularResultado() {
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // --- Passo 5: RPA (SÓ ENTRA AQUI SE O BOTÃO ESTIVER LIGADO) ---
+    // --- Passo 5: RPA (Lógica Condicional) ---
     if (usaRPA) {
-        // Lógica Visual: Abate as taxas do valor absoluto para "reduzir" a dívida visualmente
         const valorAbsoluto = Math.abs(valorAtual);
         
         const valorRPA = valorAbsoluto * TAXAS.rpa;
@@ -62,10 +61,9 @@ function calcularResultado() {
         const totalTaxasRPA = valorRPA + valorISS;
 
         if (valorAtual >= 0) {
-            // Se for lucro, desconta normal
             valorAtual -= totalTaxasRPA;
         } else {
-            // Se for dívida, "soma" para reduzir o tamanho da dívida (ex: -7000 vai para -6000)
+            // Lógica visual para diminuir a dívida
             valorAtual += totalTaxasRPA; 
         }
         
@@ -92,44 +90,49 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
     const statementList = document.getElementById('statementList');
     const valorFinalDisplay = document.getElementById('valorFinalDisplay');
     const finalCard = document.querySelector('.final-result-card');
+    
+    // Elementos de texto dinâmico
+    const labelResultado = document.getElementById('labelResultado');
     const rpaHint = document.getElementById('rpaHint');
 
     statementList.innerHTML = htmlLista;
     valorFinalDisplay.textContent = formatarMoeda(valorFinal);
     
-    // Cor do card final
+    // 1. Define a cor do card e o Título (Devedor vs A Receber)
     if (valorFinal >= 0) {
         finalCard.className = 'final-result-card text-green';
+        labelResultado.textContent = "Valor a Receber";
     } else {
         finalCard.className = 'final-result-card text-red';
+        labelResultado.textContent = "Seu saldo devedor atual é de:";
     }
 
-    // Texto explicativo "Com descontos de RPA..."
-    if (usaRPA) rpaHint.classList.remove('hidden');
-    else rpaHint.classList.add('hidden');
+    // 2. Define a mensagem sobre RPA
+    // Removemos o 'hidden' pois agora sempre queremos mostrar uma das duas mensagens
+    rpaHint.classList.remove('hidden'); 
+
+    if (usaRPA) {
+        rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
+    } else {
+        rpaHint.textContent = "(Sem descontos de RPA e ISS aplicados)";
+    }
 
     resultsSection.classList.remove('hidden');
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // Garante que o RPA comece desligado ao atualizar a página
     const checkRPA = document.getElementById('checkRPA');
     if(checkRPA) checkRPA.checked = false;
 
-    // Botão Calcular
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
     
-    // Quando clicar no botão "Emite RPA?", recalcula na hora
     checkRPA.addEventListener('change', () => {
-        // Só calcula se a área de resultados já estiver visível
         if (!document.getElementById('resultsSection').classList.contains('hidden')) {
             calcularResultado();
         }
     });
 
-    // Enter nos inputs
     ['resultadoMensal', 'saldoDevedor'].forEach(id => {
         document.getElementById(id).addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
