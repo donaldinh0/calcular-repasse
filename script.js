@@ -92,7 +92,7 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
         labelResultado.textContent = "Valor a Receber";
     } else {
         finalCard.className = 'final-result-card text-red';
-        labelResultado.textContent = "Seu saldo devedor atual é de:";
+        labelResultado.textContent = "Valor Líquido Total:";
     }
 
     rpaHint.classList.remove('hidden'); 
