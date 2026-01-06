@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Repasse</title>
+    <title>Calculadora do Trader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,8 +14,8 @@
     <main class="container">
         <div class="calculator-card">
             <header class="card-header">
-                <h1>Simulador de Repasse</h1>
-                <p>Cálculo de repasse e projeção de RPA.</p>
+                <h1>Calculadora de Repasse</h1>
+                <p>Simule seus ganhos detalhadamente.</p>
             </header>
 
             <section class="input-section">
@@ -28,44 +28,38 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="saldoDevedor">Saldo Devedor (Caso tiver)</label>
+                    <label for="saldoDevedor">Saldo Devedor (Opcional)</label>
                     <div class="currency-wrapper negative-hint">
                         <span class="currency-symbol">R$</span>
                         <input type="number" id="saldoDevedor" placeholder="0,00" step="0.01" min="0">
                     </div>
                 </div>
 
-                <button id="btnCalcular" class="cta-button">Calcular Repasse</button>
+                <button id="btnCalcular" class="cta-button">Calcular</button>
             </section>
 
             <section id="resultsSection" class="results-section hidden">
                 <div class="separator"></div>
-                <h2>Demonstrativo</h2>
+                
+                <div class="results-header">
+                    <h2>Demonstrativo</h2>
+                    
+                    <div class="rpa-toggle-wrapper">
+                        <label class="switch">
+                            <input type="checkbox" id="checkRPA">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="toggle-label">Emite RPA?</span>
+                    </div>
+                </div>
                 
                 <ul id="statementList" class="statement-list">
                    </ul>
 
-                <div class="trader-profit-box">
-                    <span>Lucro do Trader:</span>
-                    <strong id="lucroTrader">R$ 0,00</strong>
-                </div>
-
-                <ul id="debtList" class="statement-list simple-list hidden">
-                    </ul>
-
-                <div class="comparison-container">
-                    <div class="result-box main-box">
-                        <span class="box-title">Valor Líquido Total</span>
-                        <span class="box-desc">Lucro do Trader</span>
-                        <div class="box-value" id="valLiqTotal">R$ 0,00</div>
-                    </div>
-
-                    <div class="result-box rpa-box">
-                        <span class="box-title">Opção com RPA</span>
-                        <span class="box-desc">Desc. 11% e 5%</span>
-                        <div class="box-value" id="finalRPA">R$ 0,00</div>
-                        <small class="box-label">Valor Pago p/ Trader</small>
-                    </div>
+                <div class="final-result-card">
+                    <span class="final-label">Valor Final a Receber</span>
+                    <strong id="valorFinalDisplay">R$ 0,00</strong>
+                    <small id="rpaHint" class="hidden">(Com descontos de RPA e ISS aplicados)</small>
                 </div>
 
             </section>

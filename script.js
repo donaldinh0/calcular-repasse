@@ -14,98 +14,112 @@ function getInputValue(id) {
     return value ? parseFloat(value) : 0;
 }
 
+// Função principal de cálculo
 function calcularResultado() {
-    // 1. Entradas
-    let resultadoMensal = getInputValue('resultadoMensal'); 
+    // Entradas
+    let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
+    const usaRPA = document.getElementById('checkRPA').checked;
     
-    let detalhesExtrato = [];
+    // Lista para montagem do HTML
+    let extratoHTML = '';
+
+    // --- Passo 1: Resultado Mensal ---
+    extratoHTML += criarLinha("Resultado Mensal", valorAtual, "bruto");
+
+    // --- Passo 2: IR (20%) ---
+    const valorIR = valorAtual * TAXAS.ir;
+    valorAtual -= valorIR; // Subtrai
+    extratoHTML += criarLinha("(-) Imposto de Renda (20%)", -valorIR, "desconto");
     
-    // --- PARTE A: Calcular "Lucro do Trader" (Pré-dívida) ---
-    detalhesExtrato.push({ label: "Resultado Mensal", valor: resultadoMensal, tipo: "bruto" });
+    // Subtotal 1
+    extratoHTML += criarLinha("Resultado após IR", valorAtual, "subtotal");
 
-    // IR (20%)
-    const valorIR = resultadoMensal * TAXAS.ir;
-    let baseAposIR = resultadoMensal - valorIR;
-    detalhesExtrato.push({ label: `(-) Imposto de Renda (20%)`, valor: -valorIR, tipo: "desconto" });
+    // --- Passo 3: Mesa (10% sobre o restante) ---
+    const valorMesa = valorAtual * TAXAS.mesa;
+    valorAtual -= valorMesa; // Subtrai
+    extratoHTML += criarLinha("(-) Lucro da Mesa (10%)", -valorMesa, "desconto");
 
-    // Mesa (10% cascata)
-    const valorMesa = baseAposIR * TAXAS.mesa;
-    let lucroTrader = baseAposIR - valorMesa; // Lucro do Trader
-    detalhesExtrato.push({ label: `(-) Lucro da Mesa (10%)`, valor: -valorMesa, tipo: "desconto" });
+    // Subtotal 2 (Lucro do Trader)
+    extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // --- PARTE B: Calcular "Valor Líquido Total" ---
-    let valorLiquidoTotal = lucroTrader - saldoDevedor;
-
-    // --- PARTE C: Calcular RPA (Lógica Opção B) ---
-    // A pedido: Calculamos os impostos sobre o valor absoluto e SUBTRAÍMOS do montante,
-    // mantendo o sinal original.
-    
-    const valorAbsoluto = Math.abs(valorLiquidoTotal); // Ex: Transforma -7272 em 7272
-    
-    const contaA = valorAbsoluto * TAXAS.rpa; // 11%
-    const contaB = valorAbsoluto * TAXAS.iss; // 5%
-    
-    // A conta que você pediu: (Valor Líquido - A - B)
-    // Se era negativo, continua negativo, mas com magnitude menor (-6109).
-    const valorBasePositivo = valorAbsoluto - contaA - contaB;
-    
-    // Aplica o sinal original (se era dívida, continua dívida)
-    const sinal = valorLiquidoTotal < 0 ? -1 : 1;
-    const valorPagoTrader = valorBasePositivo * sinal;
-
-    renderizarResultados(detalhesExtrato, lucroTrader, saldoDevedor, valorLiquidoTotal, valorPagoTrader);
-}
-
-function renderizarResultados(extrato, lucroTrader, saldoDevedor, valorLiquidoTotal, valorPagoTrader) {
-    const resultsSection = document.getElementById('resultsSection');
-    const statementList = document.getElementById('statementList');
-    const debtList = document.getElementById('debtList');
-    
-    const elLucroTrader = document.getElementById('lucroTrader');
-    const elValLiqTotal = document.getElementById('valLiqTotal');
-    const elFinalRPA = document.getElementById('finalRPA');
-
-    // 1. Lista de descontos iniciais
-    statementList.innerHTML = '';
-    extrato.forEach(item => {
-        const li = document.createElement('li');
-        li.className = `statement-item is-${item.tipo}`;
-        li.innerHTML = `<span class="item-label">${item.label}</span><span class="item-value">${formatarMoeda(item.valor)}</span>`;
-        statementList.appendChild(li);
-    });
-
-    // 2. Lucro Trader
-    elLucroTrader.textContent = formatarMoeda(lucroTrader);
-    elLucroTrader.className = lucroTrader >= 0 ? 'text-green' : 'text-red';
-
-    // 3. Dívida
-    debtList.innerHTML = '';
+    // --- Passo 4: Dívida (se houver) ---
     if (saldoDevedor > 0) {
-        debtList.classList.remove('hidden');
-        const li = document.createElement('li');
-        li.className = `statement-item is-discount`;
-        li.innerHTML = `<span class="item-label">(-) Abatimento Saldo Devedor</span><span class="item-value">${formatarMoeda(-saldoDevedor)}</span>`;
-        debtList.appendChild(li);
-    } else {
-        debtList.classList.add('hidden');
+        valorAtual -= saldoDevedor;
+        extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // 4. Valor Líquido Total
-    elValLiqTotal.textContent = formatarMoeda(valorLiquidoTotal);
-    if(valorLiquidoTotal < 0) elValLiqTotal.classList.add('is-negative-result');
-    else elValLiqTotal.classList.remove('is-negative-result');
+    // --- Passo 5: RPA (Se a caixa estiver marcada) ---
+    if (usaRPA) {
+        // Lógica "Opção B": Desconta a taxa sobre o valor absoluto e reduz visualmente a dívida (ou lucro)
+        const valorAbsoluto = Math.abs(valorAtual);
+        
+        const valorRPA = valorAbsoluto * TAXAS.rpa;
+        const valorISS = valorAbsoluto * TAXAS.iss;
+        const totalTaxasRPA = valorRPA + valorISS;
 
-    // 5. RPA
-    elFinalRPA.textContent = formatarMoeda(valorPagoTrader);
-    if(valorPagoTrader < 0) elFinalRPA.classList.add('is-negative-result');
-    else elFinalRPA.classList.remove('is-negative-result');
+        // Se o valorAtual for positivo, subtrai as taxas (ganha menos)
+        // Se o valorAtual for negativo, "soma" as taxas (reduz a magnitude da dívida visualmente conforme seu pedido)
+        if (valorAtual >= 0) {
+            valorAtual -= totalTaxasRPA;
+        } else {
+            valorAtual += totalTaxasRPA; // -7000 + 1000 = -6000
+        }
+        
+        extratoHTML += criarLinha("(-) Desconto RPA (11%)", -valorRPA, "desconto");
+        extratoHTML += criarLinha("(-) Desconto ISS (5%)", -valorISS, "desconto");
+    }
+
+    // Renderizar
+    renderizar(extratoHTML, valorAtual, usaRPA);
+}
+
+// Função auxiliar para criar o HTML da linha
+function criarLinha(label, valor, tipo) {
+    return `
+        <li class="statement-item item-${tipo}">
+            <span class="item-label">${label}</span>
+            <span class="item-value">${formatarMoeda(valor)}</span>
+        </li>
+    `;
+}
+
+function renderizar(htmlLista, valorFinal, usaRPA) {
+    const resultsSection = document.getElementById('resultsSection');
+    const statementList = document.getElementById('statementList');
+    const valorFinalDisplay = document.getElementById('valorFinalDisplay');
+    const finalCard = document.querySelector('.final-result-card');
+    const rpaHint = document.getElementById('rpaHint');
+
+    statementList.innerHTML = htmlLista;
+    valorFinalDisplay.textContent = formatarMoeda(valorFinal);
     
+    // Atualiza cor do card final
+    if (valorFinal >= 0) {
+        finalCard.className = 'final-result-card text-green';
+    } else {
+        finalCard.className = 'final-result-card text-red';
+    }
+
+    // Mostra/Oculta dica de RPA
+    if (usaRPA) rpaHint.classList.remove('hidden');
+    else rpaHint.classList.add('hidden');
+
     resultsSection.classList.remove('hidden');
 }
 
+// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
+    // Botão Calcular
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
+    
+    // Switch RPA (Recalcula na hora se mudar)
+    document.getElementById('checkRPA').addEventListener('change', () => {
+        const sectionVisible = !document.getElementById('resultsSection').classList.contains('hidden');
+        if (sectionVisible) calcularResultado();
+    });
+
+    // Enter nos inputs
     ['resultadoMensal', 'saldoDevedor'].forEach(id => {
         document.getElementById(id).addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
