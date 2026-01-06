@@ -19,7 +19,6 @@
             </header>
 
             <section class="input-section">
-                
                 <div class="input-group">
                     <label for="resultadoMensal">Resultado Mensal</label>
                     <div class="currency-wrapper">
@@ -43,24 +42,33 @@
                 <div class="separator"></div>
                 <h2>Demonstrativo</h2>
                 
-                <ul id="statementList" class="statement-list">
-                   </ul>
+                <ul id="statementList" class="statement-list"></ul>
 
-                <div class="middle-result">
-                    <span>Valor Líquido Total:</span>
-                    <strong id="valLiqTotal">R$ 0,00</strong>
+                <div class="intermediate-result">
+                    <span>Lucro do Trader (Pré-dívida):</span>
+                    <strong id="lucroTrader">R$ 0,00</strong>
+                </div>
+
+                <div id="dividaLine" class="statement-list simple-list hidden">
+                    <div class="statement-item is-desconto">
+                        <span class="item-label">(-) Abatimento Saldo Devedor</span>
+                        <span id="valDivida" class="item-value">R$ 0,00</span>
+                    </div>
+                </div>
+
+                <div class="main-result">
+                    <span class="main-label">Valor Líquido Total</span>
+                    <strong id="valLiqTotal" class="main-value">R$ 0,00</strong>
+                    <small>Lucro do Trader - Saldo Devedor</small>
                 </div>
 
                 <div class="comparison-container">
-                    <div class="result-box pj-box">
-                        <span class="box-title">PJ (Padrão)</span>
-                        <span class="box-desc">Líquido - Dívida</span>
-                        <div class="box-value" id="finalPJ">R$ 0,00</div>
-                    </div>
-
                     <div class="result-box rpa-box">
-                        <span class="box-title">Com RPA</span>
-                        <span class="box-desc">Deduzindo RPA (11%) e ISS (5%)</span>
+                        <span class="box-title">Opção com RPA</span>
+                        <span class="box-desc">
+                            Líquido Total - 11% (INSS) - 5% (ISS)<br>
+                            <em>Taxas aplicadas sobre o Líquido Total</em>
+                        </span>
                         <div class="box-value" id="finalRPA">R$ 0,00</div>
                         <small class="box-label">Valor Pago p/ Trader</small>
                     </div>
