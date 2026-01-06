@@ -25,12 +25,12 @@ function calcularResultado() {
     // Mensal - IR - Mesa
     detalhesExtrato.push({ label: "Resultado Mensal", valor: resultadoMensal, tipo: "bruto" });
 
-    // IR
+    // IR (20%)
     const valorIR = resultadoMensal * TAXAS.ir;
     let baseAposIR = resultadoMensal - valorIR;
     detalhesExtrato.push({ label: `(-) Imposto de Renda (20%)`, valor: -valorIR, tipo: "desconto" });
 
-    // Mesa
+    // Mesa (10% cascata)
     const valorMesa = baseAposIR * TAXAS.mesa;
     let lucroTrader = baseAposIR - valorMesa; // Esse é o "Lucro do Trader"
     detalhesExtrato.push({ label: `(-) Lucro da Mesa (10%)`, valor: -valorMesa, tipo: "desconto" });
@@ -40,9 +40,8 @@ function calcularResultado() {
     let valorLiquidoTotal = lucroTrader - saldoDevedor;
 
     // --- PARTE C: Calcular RPA ---
-    // Baseado no Valor Líquido Total
-    // Obs: Usamos Math.abs() para calcular o valor do imposto (custo) sobre o montante,
-    // garantindo que ele seja subtraído corretamente.
+    // Regra nova: (Valor Líquido Total) - 11% - 5%
+    // Math.abs garante que descontamos o valor da taxa mesmo se o saldo for negativo
     const baseCalculoRPA = Math.abs(valorLiquidoTotal);
     
     const contaA = baseCalculoRPA * TAXAS.rpa; // 11%
@@ -56,13 +55,12 @@ function calcularResultado() {
 function renderizarResultados(extrato, lucroTrader, saldoDevedor, valorLiquidoTotal, valorPagoTrader) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
+    const debtList = document.getElementById('debtList');
     
-    // Elementos
+    // Elementos de Valor
     const elLucroTrader = document.getElementById('lucroTrader');
     const elValLiqTotal = document.getElementById('valLiqTotal');
     const elFinalRPA = document.getElementById('finalRPA');
-    const divDivida = document.getElementById('dividaLine');
-    const elValDivida = document.getElementById('valDivida');
 
     // 1. Lista de descontos iniciais
     statementList.innerHTML = '';
@@ -73,26 +71,31 @@ function renderizarResultados(extrato, lucroTrader, saldoDevedor, valorLiquidoTo
         statementList.appendChild(li);
     });
 
-    // 2. Lucro do Trader (Verde/Vermelho)
+    // 2. Box Intermediário (Lucro Trader)
     elLucroTrader.textContent = formatarMoeda(lucroTrader);
     elLucroTrader.className = lucroTrader >= 0 ? 'text-green' : 'text-red';
 
-    // 3. Linha do Saldo Devedor
+    // 3. Lista de Dívida (Apenas se tiver dívida)
+    debtList.innerHTML = '';
     if (saldoDevedor > 0) {
-        divDivida.classList.remove('hidden');
-        elValDivida.textContent = formatarMoeda(-saldoDevedor);
+        debtList.classList.remove('hidden');
+        const li = document.createElement('li');
+        li.className = `statement-item is-discount`;
+        li.innerHTML = `<span class="item-label">(-) Abatimento Saldo Devedor</span><span class="item-value">${formatarMoeda(-saldoDevedor)}</span>`;
+        debtList.appendChild(li);
     } else {
-        divDivida.classList.add('hidden');
+        debtList.classList.add('hidden');
     }
 
-    // 4. Valor Líquido Total (Principal)
+    // 4. Box Valor Líquido Total
     elValLiqTotal.textContent = formatarMoeda(valorLiquidoTotal);
-    // Se quiser colorir o principal também:
-    if(valorLiquidoTotal < 0) elValLiqTotal.style.color = 'var(--danger-color)';
-    else elValLiqTotal.style.color = 'var(--text-main)';
+    if(valorLiquidoTotal < 0) elValLiqTotal.classList.add('is-negative-result');
+    else elValLiqTotal.classList.remove('is-negative-result');
 
     // 5. Box RPA
     elFinalRPA.textContent = formatarMoeda(valorPagoTrader);
+    if(valorPagoTrader < 0) elFinalRPA.classList.add('is-negative-result');
+    else elFinalRPA.classList.remove('is-negative-result');
     
     resultsSection.classList.remove('hidden');
 }

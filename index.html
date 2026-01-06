@@ -42,33 +42,27 @@
                 <div class="separator"></div>
                 <h2>Demonstrativo</h2>
                 
-                <ul id="statementList" class="statement-list"></ul>
+                <ul id="statementList" class="statement-list">
+                   </ul>
 
-                <div class="intermediate-result">
+                <div class="trader-profit-box">
                     <span>Lucro do Trader (Pré-dívida):</span>
                     <strong id="lucroTrader">R$ 0,00</strong>
                 </div>
 
-                <div id="dividaLine" class="statement-list simple-list hidden">
-                    <div class="statement-item is-desconto">
-                        <span class="item-label">(-) Abatimento Saldo Devedor</span>
-                        <span id="valDivida" class="item-value">R$ 0,00</span>
-                    </div>
-                </div>
-
-                <div class="main-result">
-                    <span class="main-label">Valor Líquido Total</span>
-                    <strong id="valLiqTotal" class="main-value">R$ 0,00</strong>
-                    <small>Lucro do Trader - Saldo Devedor</small>
-                </div>
+                <ul id="debtList" class="statement-list simple-list hidden">
+                    </ul>
 
                 <div class="comparison-container">
+                    <div class="result-box main-box">
+                        <span class="box-title">Valor Líquido Total</span>
+                        <span class="box-desc">Lucro do Trader - Dívida</span>
+                        <div class="box-value" id="valLiqTotal">R$ 0,00</div>
+                    </div>
+
                     <div class="result-box rpa-box">
                         <span class="box-title">Opção com RPA</span>
-                        <span class="box-desc">
-                            Líquido Total - 11% (INSS) - 5% (ISS)<br>
-                            <em>Taxas aplicadas sobre o Líquido Total</em>
-                        </span>
+                        <span class="box-desc">Desc. 11% e 5% s/ Líq. Total</span>
                         <div class="box-value" id="finalRPA">R$ 0,00</div>
                         <small class="box-label">Valor Pago p/ Trader</small>
                     </div>

@@ -1,81 +1,129 @@
-/* ... (Mantenha o início do arquivo igual até .statement-list) ... */
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --success-color: #16a34a;
+    --danger-color: #dc2626;
+    --bg-gradient: linear-gradient(135deg, #f0f2f5 0%, #e2e8f0 100%);
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --input-bg: #f8fafc;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
 
-/* Adicione/Substitua a partir daqui */
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-.intermediate-result {
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-main);
+    min-height: 100vh;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: var(--radius-sm);
-    background: #f8fafc;
-    border: 1px dashed var(--border-color);
+    padding: 20px;
 }
 
-.intermediate-result span {
-    font-weight: 600;
-    color: var(--text-muted);
+.container { width: 100%; max-width: 600px; }
+
+.calculator-card {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
 }
 
-.intermediate-result strong {
-    font-size: 1.1rem;
-    font-weight: 700;
-}
+.card-header { text-align: center; margin-bottom: 2rem; }
+.card-header h1 { font-size: 1.75rem; font-weight: 700; color: var(--text-main); }
+.card-header p { color: var(--text-muted); margin-top: 0.5rem; }
 
-/* Cores dinâmicas para o Lucro do Trader */
+/* Inputs */
+.input-group { margin-bottom: 1.5rem; }
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-main); }
+.currency-wrapper { position: relative; display: flex; align-items: center; }
+.currency-symbol { position: absolute; left: 1rem; color: var(--text-muted); font-weight: 500; }
+.currency-wrapper input {
+    width: 100%; padding: 0.85rem 1rem 0.85rem 3rem;
+    border: 2px solid var(--border-color); border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif; font-size: 1.1rem;
+    background: var(--input-bg); transition: all 0.2s; outline: none;
+}
+.currency-wrapper input:focus { border-color: var(--primary-color); background: #fff; }
+input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+.cta-button {
+    width: 100%; padding: 1rem; background: var(--primary-color);
+    color: white; border: none; border-radius: var(--radius-sm);
+    font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: background-color 0.2s;
+}
+.cta-button:hover { background: var(--primary-hover); }
+
+/* Resultados */
+.hidden { display: none; }
+.separator { height: 2px; background: var(--border-color); margin: 2rem 0; }
+.results-section h2 { font-size: 1.25rem; margin-bottom: 1rem; }
+
+.statement-list {
+    list-style: none; border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1rem;
+}
+.statement-item {
+    display: flex; justify-content: space-between; padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--border-color); font-size: 0.95rem;
+}
+.statement-item:last-child { border-bottom: none; }
+.statement-item:nth-child(even) { background-color: #f8fafc; }
+.statement-item.is-discount .item-value { color: var(--danger-color); font-weight: 500; }
+.statement-item.is-bruto .item-value { font-weight: 700; }
+
+/* Box do Lucro Trader (Intermediário) */
+.trader-profit-box {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 1rem; background: #f0f9ff; border-radius: var(--radius-sm);
+    color: var(--primary-color); margin-bottom: 1rem; border: 1px dashed #bae6fd;
+}
+.trader-profit-box strong { font-size: 1.1rem; }
 .text-green { color: var(--success-color); }
 .text-red { color: var(--danger-color); }
 
-.simple-list {
-    margin-bottom: 1rem;
-    border-top: none;
-    border-radius: var(--radius-sm);
+/* Grid de Comparação (O Robustez que você gostou) */
+.comparison-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
-.main-result {
+.result-box {
+    padding: 1.25rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
     text-align: center;
-    padding: 1.5rem;
-    background: var(--bg-gradient);
-    border-radius: var(--radius-md);
-    border: 1px solid #cbd5e1;
-    margin-bottom: 1.5rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-}
-
-.main-label {
-    font-size: 0.9rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
-
-.main-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text-main);
-    margin-bottom: 0.25rem;
-}
-
-.main-result small {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-}
-
-/* Ajuste no box do RPA para ficar centralizado ou full width se for único */
-.comparison-container {
-    display: flex;
     justify-content: center;
 }
-.rpa-box {
-    width: 100%;
-    background: #fff1f2;
-    border-color: #fda4af;
-}
+
+.main-box { background: #f0fdf4; border-color: #bbf7d0; } /* Verde claro */
+.rpa-box { background: #fef2f2; border-color: #fca5a5; } /* Vermelho claro */
+
+.box-title { font-weight: 700; display: block; margin-bottom: 0.25rem; font-size: 1rem; }
+.box-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1rem; display: block; line-height: 1.2; height: 30px; } /* Altura fixa para alinhar */
+.box-value { font-size: 1.25rem; font-weight: 800; }
+.box-label { margin-top: 0.5rem; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.7; }
+
+/* Cores dos valores finais */
+.main-box .box-value { color: #166534; }
 .rpa-box .box-value { color: var(--danger-color); }
 
-/* ... (O resto pode manter igual) ... */
+/* Se o valor principal ficar negativo */
+.is-negative-result { color: var(--danger-color) !important; }
+
+@media (max-width: 500px) {
+    .comparison-container { grid-template-columns: 1fr; }
+    .box-desc { height: auto; }
+}
