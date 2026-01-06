@@ -14,23 +14,18 @@ function getInputValue(id) {
     return value ? parseFloat(value) : 0;
 }
 
-// Função principal de cálculo
 function calcularResultado() {
-    // 1. Pega os valores
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
-    
-    // 2. Verifica RPA
     const checkRPA = document.getElementById('checkRPA');
     const usaRPA = checkRPA.checked; 
     
-    // Lista para montagem do HTML
     let extratoHTML = '';
 
-    // --- Passo 1: Resultado Mensal ---
+    // 1. Mensal
     extratoHTML += criarLinha("Resultado Mensal", valorAtual, "bruto");
 
-    // --- Passo 2: IR (20%) ---
+    // 2. IR
     const valorIR = valorAtual * TAXAS.ir;
     valorAtual -= valorIR; 
     extratoHTML += criarLinha("(-) Imposto de Renda (20%)", -valorIR, "desconto");
@@ -38,7 +33,7 @@ function calcularResultado() {
     // Subtotal 1
     extratoHTML += criarLinha("Resultado após IR", valorAtual, "subtotal");
 
-    // --- Passo 3: Mesa (10% sobre o restante) ---
+    // 3. Mesa
     const valorMesa = valorAtual * TAXAS.mesa;
     valorAtual -= valorMesa; 
     extratoHTML += criarLinha("(-) Lucro da Mesa (10%)", -valorMesa, "desconto");
@@ -46,16 +41,15 @@ function calcularResultado() {
     // Subtotal 2 (Lucro do Trader)
     extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // --- Passo 4: Dívida (se houver) ---
+    // 4. Dívida
     if (saldoDevedor > 0) {
         valorAtual -= saldoDevedor;
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // --- Passo 5: RPA (Lógica Condicional) ---
+    // 5. RPA
     if (usaRPA) {
         const valorAbsoluto = Math.abs(valorAtual);
-        
         const valorRPA = valorAbsoluto * TAXAS.rpa;
         const valorISS = valorAbsoluto * TAXAS.iss;
         const totalTaxasRPA = valorRPA + valorISS;
@@ -63,7 +57,6 @@ function calcularResultado() {
         if (valorAtual >= 0) {
             valorAtual -= totalTaxasRPA;
         } else {
-            // Lógica visual para diminuir a dívida
             valorAtual += totalTaxasRPA; 
         }
         
@@ -71,11 +64,9 @@ function calcularResultado() {
         extratoHTML += criarLinha("(-) Desconto ISS (5%)", -valorISS, "desconto");
     }
 
-    // Renderizar na tela
     renderizar(extratoHTML, valorAtual, usaRPA);
 }
 
-// Cria o HTML da linha
 function criarLinha(label, valor, tipo) {
     return `
         <li class="statement-item item-${tipo}">
@@ -90,15 +81,12 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
     const statementList = document.getElementById('statementList');
     const valorFinalDisplay = document.getElementById('valorFinalDisplay');
     const finalCard = document.querySelector('.final-result-card');
-    
-    // Elementos de texto dinâmico
     const labelResultado = document.getElementById('labelResultado');
     const rpaHint = document.getElementById('rpaHint');
 
     statementList.innerHTML = htmlLista;
     valorFinalDisplay.textContent = formatarMoeda(valorFinal);
     
-    // 1. Define a cor do card e o Título (Devedor vs A Receber)
     if (valorFinal >= 0) {
         finalCard.className = 'final-result-card text-green';
         labelResultado.textContent = "Valor a Receber";
@@ -107,10 +95,7 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
         labelResultado.textContent = "Seu saldo devedor atual é de:";
     }
 
-    // 2. Define a mensagem sobre RPA
-    // Removemos o 'hidden' pois agora sempre queremos mostrar uma das duas mensagens
     rpaHint.classList.remove('hidden'); 
-
     if (usaRPA) {
         rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
     } else {
@@ -120,7 +105,6 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
     resultsSection.classList.remove('hidden');
 }
 
-// Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     const checkRPA = document.getElementById('checkRPA');
     if(checkRPA) checkRPA.checked = false;
@@ -137,5 +121,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById(id).addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
         });
+    });
+
+    // --- NOVA LÓGICA DO BOTÃO DE AJUDA ---
+    // Permite clicar no "?" para abrir o balão no celular
+    const btnHelp = document.getElementById('btnHelp');
+    const tooltipText = document.querySelector('.tooltip-text');
+
+    btnHelp.addEventListener('click', (e) => {
+        e.stopPropagation(); // Evita que o clique feche imediatamente
+        tooltipText.classList.toggle('show-tooltip');
+    });
+
+    // Fecha o balão se clicar em qualquer outro lugar da tela
+    document.addEventListener('click', () => {
+        tooltipText.classList.remove('show-tooltip');
     });
 });
