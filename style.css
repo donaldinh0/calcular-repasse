@@ -1,7 +1,6 @@
 :root {
     /* --- Link da Imagem de Fundo --- */
-    /* Certifique-se de que o arquivo 'fundo.jpg' está na mesma pasta */
-    --bg-image-url: url('fundo.jpg');
+    --bg-image-url: url('tsr1.jpg');
 
     /* --- Paleta Dark Mode (Cyber/Slate) --- */
     --primary-color: #3b82f6;
