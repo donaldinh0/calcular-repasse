@@ -57,7 +57,11 @@ body::before {
     background-repeat: no-repeat;
 
     /* --- AJUSTE AQUI A INTENSIDADE --- */
+<<<<<<< HEAD
     opacity: 0.05; /* 0.1 = 10% visível. Tente entre 0.05 e 0.2 */
+=======
+    opacity: 0.1; /* 0.1 = 10% visível. Tente entre 0.05 e 0.2 */
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
     
     /* Opcional: Deixa a imagem em preto e branco para ficar mais sóbrio */
     filter: grayscale(15%); 

@@ -5,8 +5,11 @@ const TAXAS = {
     iss: 0.05
 };
 
+<<<<<<< HEAD
 // --- Funções de Formatação (Máscara) ---
 
+=======
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
@@ -47,7 +50,10 @@ function getInputValue(id) {
     return parseFloat(numeroLimpo);
 }
 
+<<<<<<< HEAD
 // --- Lógica de Cálculo (Mantida igual) ---
+=======
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
 function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
@@ -126,7 +132,11 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
         labelResultado.textContent = "Valor a Receber";
     } else {
         finalCard.className = 'final-result-card text-red';
+<<<<<<< HEAD
         labelResultado.textContent = "Seu saldo devedor atual é de:";
+=======
+        labelResultado.textContent = "Valor Líquido Total:";
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
     }
 
     rpaHint.classList.remove('hidden'); 
@@ -144,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkRPA = document.getElementById('checkRPA');
     if(checkRPA) checkRPA.checked = false;
 
+<<<<<<< HEAD
     // 1. Aplica a máscara nos campos enquanto digita
     const inputsMoeda = document.querySelectorAll('.money-input');
     inputsMoeda.forEach(input => {
@@ -151,10 +162,23 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Permite calcular apertando Enter
         input.addEventListener('keypress', (e) => {
+=======
+    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
+    
+    checkRPA.addEventListener('change', () => {
+        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
+            calcularResultado();
+        }
+    });
+
+    ['resultadoMensal', 'saldoDevedor'].forEach(id => {
+        document.getElementById(id).addEventListener('keypress', (e) => {
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
             if (e.key === 'Enter') calcularResultado();
         });
     });
 
+<<<<<<< HEAD
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
     
     checkRPA.addEventListener('change', () => {
@@ -164,14 +188,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Tooltip Mobile
+=======
+    // --- NOVA LÓGICA DO BOTÃO DE AJUDA ---
+    // Permite clicar no "?" para abrir o balão no celular
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
     const btnHelp = document.getElementById('btnHelp');
     const tooltipText = document.querySelector('.tooltip-text');
 
     btnHelp.addEventListener('click', (e) => {
+<<<<<<< HEAD
         e.stopPropagation(); 
         tooltipText.classList.toggle('show-tooltip');
     });
 
+=======
+        e.stopPropagation(); // Evita que o clique feche imediatamente
+        tooltipText.classList.toggle('show-tooltip');
+    });
+
+    // Fecha o balão se clicar em qualquer outro lugar da tela
+>>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
     document.addEventListener('click', () => {
         tooltipText.classList.remove('show-tooltip');
     });
