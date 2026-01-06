@@ -5,38 +5,12 @@ const TAXAS = {
     iss: 0.05
 };
 
-<<<<<<< HEAD
-// --- Funções de Formatação (Máscara) ---
-
-=======
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
+// --- Formatadores ---
 function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-}
-
-// Essa função formata o campo ENQUANTO você digita
-function aplicarMascaraMoeda(event) {
-    const input = event.target;
-    let valor = input.value;
-    
-    // 1. Remove tudo que não for número
-    valor = valor.replace(/\D/g, "");
-    
-    // 2. Se estiver vazio, limpa
-    if (valor === "") {
-        input.value = "";
-        return;
-    }
-
-    // 3. Converte para número (considerando centavos) e formata
-    // Ex: digita 30000 -> vira 300.00 -> formata para 300,00
-    // Ex: digita 3000000 -> vira 30000.00 -> formata para 30.000,00
-    valor = (parseInt(valor) / 100).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-    });
-
-    input.value = valor;
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(valor);
 }
 
 // Função para ler o valor formatado e converter para número de cálculo
@@ -50,10 +24,7 @@ function getInputValue(id) {
     return parseFloat(numeroLimpo);
 }
 
-<<<<<<< HEAD
-// --- Lógica de Cálculo (Mantida igual) ---
-=======
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
+// --- Lógica Principal (Cascata) ---
 function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
@@ -119,29 +90,29 @@ function criarLinha(label, valor, tipo) {
 function renderizar(htmlLista, valorFinal, usaRPA) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
-    const valorFinalDisplay = document.getElementById('valorFinalDisplay');
-    const finalCard = document.querySelector('.final-result-card');
-    const labelResultado = document.getElementById('labelResultado');
-    const rpaHint = document.getElementById('rpaHint');
+    const finalAmountEl = document.getElementById('finalAmount');
+    const finalResultCard = document.querySelector('.final-result');
+    const debtAlert = document.getElementById('debtAlert');
 
-    statementList.innerHTML = htmlLista;
-    valorFinalDisplay.textContent = formatarMoeda(valorFinal);
-    
-    if (valorFinal >= 0) {
-        finalCard.className = 'final-result-card text-green';
-        labelResultado.textContent = "Valor a Receber";
-    } else {
-        finalCard.className = 'final-result-card text-red';
-<<<<<<< HEAD
-        labelResultado.textContent = "Seu saldo devedor atual é de:";
-=======
-        labelResultado.textContent = "Valor Líquido Total:";
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
-    }
+    statementList.innerHTML = '';
 
-    rpaHint.classList.remove('hidden'); 
-    if (usaRPA) {
-        rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
+    extrato.forEach(item => {
+        const li = document.createElement('li');
+        li.className = `statement-item is-${item.tipo}`;
+        li.innerHTML = `
+            <span class="item-label">${item.label}</span>
+            <span class="item-value">${formatarMoeda(item.valor)}</span>
+        `;
+        statementList.appendChild(li);
+    });
+
+    finalAmountEl.textContent = formatarMoeda(valorFinal);
+    resultsSection.classList.remove('hidden');
+
+    if (valorFinal < 0) {
+        finalResultCard.classList.add('negative-balance');
+        debtAlert.classList.remove('hidden');
+        document.querySelector('.result-label').textContent = "Saldo Devedor Final:";
     } else {
         rpaHint.textContent = "(Sem descontos de RPA e ISS aplicados)";
     }
@@ -151,64 +122,10 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', () => {
-    const checkRPA = document.getElementById('checkRPA');
-    if(checkRPA) checkRPA.checked = false;
-
-<<<<<<< HEAD
-    // 1. Aplica a máscara nos campos enquanto digita
-    const inputsMoeda = document.querySelectorAll('.money-input');
-    inputsMoeda.forEach(input => {
-        input.addEventListener('input', aplicarMascaraMoeda);
-        
-        // Permite calcular apertando Enter
-        input.addEventListener('keypress', (e) => {
-=======
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    
-    checkRPA.addEventListener('change', () => {
-        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
-            calcularResultado();
-        }
-    });
-
-    ['resultadoMensal', 'saldoDevedor'].forEach(id => {
+    ['lucroLiquido', 'saldoDevedor'].forEach(id => {
         document.getElementById(id).addEventListener('keypress', (e) => {
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
             if (e.key === 'Enter') calcularResultado();
         });
-    });
-
-<<<<<<< HEAD
-    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    
-    checkRPA.addEventListener('change', () => {
-        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
-            calcularResultado();
-        }
-    });
-
-    // Tooltip Mobile
-=======
-    // --- NOVA LÓGICA DO BOTÃO DE AJUDA ---
-    // Permite clicar no "?" para abrir o balão no celular
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
-    const btnHelp = document.getElementById('btnHelp');
-    const tooltipText = document.querySelector('.tooltip-text');
-
-    btnHelp.addEventListener('click', (e) => {
-<<<<<<< HEAD
-        e.stopPropagation(); 
-        tooltipText.classList.toggle('show-tooltip');
-    });
-
-=======
-        e.stopPropagation(); // Evita que o clique feche imediatamente
-        tooltipText.classList.toggle('show-tooltip');
-    });
-
-    // Fecha o balão se clicar em qualquer outro lugar da tela
->>>>>>> fec113613dd0673b5ca0e393e99e5cda76257b68
-    document.addEventListener('click', () => {
-        tooltipText.classList.remove('show-tooltip');
     });
 });
