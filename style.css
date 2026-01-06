@@ -1,6 +1,7 @@
 :root {
     /* --- Link da Imagem de Fundo --- */
-    --bg-image-url: url('tsr1.jpg'); 
+    /* Certifique-se de que o arquivo 'fundo.jpg' está na mesma pasta */
+    --bg-image-url: url('fundo.jpg');
 
     /* --- Paleta Dark Mode (Cyber/Slate) --- */
     --primary-color: #3b82f6;
@@ -30,7 +31,6 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    /* Mantemos o gradiente original como base/fallback */
     background: var(--bg-gradient);
     color: var(--text-main);
     min-height: 100vh;
@@ -38,27 +38,34 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    position: relative; /* Necessário para o posicionamento do fundo */
+    position: relative;
 }
 
-/* --- NOVO: Camada da Imagem de Fundo --- */
+/* --- Camada da Imagem de Fundo --- */
 body::before {
     content: "";
-    position: fixed; /* Fixa a imagem para ela não rolar com a página */
-    top: 0;
-    left: 0;
-    width: 100%;
-    max-width: 550px;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+
+    background-image: var(--bg-image-url);
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* Opacidade da imagem (10%) */
+    opacity: 0.1; 
+    filter: grayscale(100%); 
 }
 
-/* --- Card Principal --- */
+.container { width: 100%; max-width: 500px; }
+
 .calculator-card {
     background: var(--card-bg);
     padding: 2rem;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
     border: 1px solid var(--border-color);
-    /* Adiciona um leve backdrop-filter para o cartão destacar do fundo */
     backdrop-filter: blur(10px); 
 }
 
@@ -86,15 +93,6 @@ body::before {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
 }
 
-input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
-.cta-button {
-    width: 100%; padding: 0.85rem; background: var(--primary-color);
-    color: white; border: none; border-radius: var(--radius-sm);
-    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 0.5rem;
-}
-.cta-button:hover { background: var(--primary-hover); }
-
 /* --- Resultados --- */
 .hidden { display: none; }
 .separator { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
@@ -104,7 +102,7 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 }
 .results-header h2 { font-size: 1.1rem; color: var(--text-main); margin: 0; }
 
-/* --- Toggle Group e Tooltip --- */
+/* --- Toggle e Tooltip --- */
 .rpa-toggle-wrapper { display: flex; align-items: center; gap: 8px; }
 .toggle-group { display: flex; align-items: center; gap: 8px; }
 
@@ -112,7 +110,6 @@ input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer
 .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 
-/* Slider do Switch */
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; }
 .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
 input:checked + .slider { background-color: var(--primary-color); }
@@ -126,19 +123,16 @@ input:checked + .slider:before { transform: translateX(18px); }
 .help-icon {
     display: inline-flex; justify-content: center; align-items: center;
     width: 20px; height: 20px;
-    background: #334155;
-    color: var(--text-muted);
+    background: #334155; color: var(--text-muted);
     border-radius: 50%; font-size: 12px; font-weight: 700;
     cursor: pointer; transition: all 0.2s; user-select: none;
 }
-
 .help-icon:hover { background: var(--primary-color); color: white; }
 
 /* Balão do Tooltip */
 .tooltip-text {
     visibility: hidden; width: 280px;
-    background-color: #0f172a;
-    color: #e2e8f0;
+    background-color: #0f172a; color: #e2e8f0;
     text-align: left; border-radius: 8px; padding: 12px;
     position: absolute; z-index: 10;
     bottom: 135%; left: 50%; transform: translateX(-90%);
@@ -180,12 +174,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 .item-bruto .item-value { font-weight: 700; color: var(--text-main); }
 .item-desconto .item-value { color: var(--danger-color); }
-
-/* Subtotal Dark */
-.item-subtotal { 
-    background-color: #334155;
-    font-weight: 600; color: #fff; 
-}
+.item-subtotal { background-color: #334155; font-weight: 600; color: #fff; }
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
 /* --- Cartão Final --- */
@@ -195,19 +184,9 @@ input:checked + .slider:before { transform: translateX(18px); }
     border-radius: var(--radius-md);
     background: transparent;
 }
-
 .final-label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
 .final-result-card strong { display: block; font-size: 1.75rem; font-weight: 800; }
 .final-result-card small { display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
 
-/* Cores de status (Ajustadas para Dark Mode) */
-.text-green { 
-    color: var(--success-color) !important; 
-    border-color: var(--success-color) !important; 
-    background: var(--success-bg) !important; 
-}
-.text-red { 
-    color: var(--danger-color) !important; 
-    border-color: var(--danger-color) !important; 
-    background: var(--danger-bg) !important; 
-}
+.text-green { color: var(--success-color) !important; border-color: var(--success-color) !important; background: var(--success-bg) !important; }
+.text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }

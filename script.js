@@ -5,26 +5,43 @@ const TAXAS = {
     iss: 0.05
 };
 
-// --- Formatadores ---
+// --- Funções de Formatação (Máscara) ---
 function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    }).format(valor);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 
-// Função para ler o valor formatado e converter para número de cálculo
+// Formata o campo ENQUANTO você digita
+function aplicarMascaraMoeda(event) {
+    const input = event.target;
+    let valor = input.value;
+    
+    // Remove tudo que não for número
+    valor = valor.replace(/\D/g, "");
+    
+    if (valor === "") {
+        input.value = "";
+        return;
+    }
+
+    // Converte (ex: 30000 -> 300.00) e formata pt-BR
+    valor = (parseInt(valor) / 100).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+    input.value = valor;
+}
+
+// Converte string formatada "30.000,00" para float JS
 function getInputValue(id) {
     const value = document.getElementById(id).value;
     if (!value) return 0;
-
-    // Remove pontos de milhar e troca vírgula por ponto decimal
-    // Ex: "30.000,00" -> "30000.00"
+    // Remove pontos de milhar, troca vírgula por ponto
     const numeroLimpo = value.replace(/\./g, "").replace(",", ".");
     return parseFloat(numeroLimpo);
 }
 
-// --- Lógica Principal (Cascata) ---
+// --- Lógica de Cálculo ---
 function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
@@ -90,29 +107,25 @@ function criarLinha(label, valor, tipo) {
 function renderizar(htmlLista, valorFinal, usaRPA) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
-    const finalAmountEl = document.getElementById('finalAmount');
-    const finalResultCard = document.querySelector('.final-result');
-    const debtAlert = document.getElementById('debtAlert');
+    const valorFinalDisplay = document.getElementById('valorFinalDisplay');
+    const finalCard = document.querySelector('.final-result-card');
+    const labelResultado = document.getElementById('labelResultado');
+    const rpaHint = document.getElementById('rpaHint');
 
-    statementList.innerHTML = '';
+    statementList.innerHTML = htmlLista;
+    valorFinalDisplay.textContent = formatarMoeda(valorFinal);
+    
+    if (valorFinal >= 0) {
+        finalCard.className = 'final-result-card text-green';
+        labelResultado.textContent = "Valor a Receber";
+    } else {
+        finalCard.className = 'final-result-card text-red';
+        labelResultado.textContent = "Seu saldo devedor atual é de:";
+    }
 
-    extrato.forEach(item => {
-        const li = document.createElement('li');
-        li.className = `statement-item is-${item.tipo}`;
-        li.innerHTML = `
-            <span class="item-label">${item.label}</span>
-            <span class="item-value">${formatarMoeda(item.valor)}</span>
-        `;
-        statementList.appendChild(li);
-    });
-
-    finalAmountEl.textContent = formatarMoeda(valorFinal);
-    resultsSection.classList.remove('hidden');
-
-    if (valorFinal < 0) {
-        finalResultCard.classList.add('negative-balance');
-        debtAlert.classList.remove('hidden');
-        document.querySelector('.result-label').textContent = "Saldo Devedor Final:";
+    rpaHint.classList.remove('hidden'); 
+    if (usaRPA) {
+        rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
     } else {
         rpaHint.textContent = "(Sem descontos de RPA e ISS aplicados)";
     }
@@ -122,10 +135,35 @@ function renderizar(htmlLista, valorFinal, usaRPA) {
 
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    ['lucroLiquido', 'saldoDevedor'].forEach(id => {
-        document.getElementById(id).addEventListener('keypress', (e) => {
+    const checkRPA = document.getElementById('checkRPA');
+    if(checkRPA) checkRPA.checked = false;
+
+    const inputsMoeda = document.querySelectorAll('.money-input');
+    inputsMoeda.forEach(input => {
+        input.addEventListener('input', aplicarMascaraMoeda);
+        input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
         });
+    });
+
+    document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
+    
+    checkRPA.addEventListener('change', () => {
+        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
+            calcularResultado();
+        }
+    });
+
+    // Tooltip Mobile Logic
+    const btnHelp = document.getElementById('btnHelp');
+    const tooltipText = document.querySelector('.tooltip-text');
+
+    btnHelp.addEventListener('click', (e) => {
+        e.stopPropagation(); 
+        tooltipText.classList.toggle('show-tooltip');
+    });
+
+    document.addEventListener('click', () => {
+        tooltipText.classList.remove('show-tooltip');
     });
 });
