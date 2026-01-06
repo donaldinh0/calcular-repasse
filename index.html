@@ -15,27 +15,16 @@
         <div class="calculator-card">
             <header class="card-header">
                 <h1>Simulador de Repasse</h1>
-                <p>Cálculo em cascata (IR > Mesa > Dívida > Taxas).</p>
+                <p>Cálculo de repasse e projeção de RPA.</p>
             </header>
 
             <section class="input-section">
-                <div class="toggle-container">
-                    <span class="toggle-label">Tipo de Contrato:</span>
-                    <div class="toggle-switch">
-                        <input type="radio" id="type-pj" name="contract-type" value="PJ" checked>
-                        <label for="type-pj" class="toggle-btn">PJ</label>
-                        
-                        <input type="radio" id="type-pf" name="contract-type" value="PF">
-                        <label for="type-pf" class="toggle-btn">PF</label>
-                        <div class="toggle-marker"></div>
-                    </div>
-                </div>
-
+                
                 <div class="input-group">
-                    <label for="lucroLiquido">Lucro Líquido (Trader)</label>
+                    <label for="resultadoMensal">Resultado Mensal</label>
                     <div class="currency-wrapper">
                         <span class="currency-symbol">R$</span>
-                        <input type="number" id="lucroLiquido" placeholder="0,00" step="0.01">
+                        <input type="number" id="resultadoMensal" placeholder="0,00" step="0.01">
                     </div>
                 </div>
 
@@ -45,7 +34,6 @@
                         <span class="currency-symbol">R$</span>
                         <input type="number" id="saldoDevedor" placeholder="0,00" step="0.01" min="0">
                     </div>
-                    <small>Valor que o trader deve à mesa, se houver.</small>
                 </div>
 
                 <button id="btnCalcular" class="cta-button">Calcular Repasse</button>
@@ -53,18 +41,31 @@
 
             <section id="resultsSection" class="results-section hidden">
                 <div class="separator"></div>
-                <h2>Extrato do Repasse</h2>
+                <h2>Demonstrativo</h2>
                 
                 <ul id="statementList" class="statement-list">
                    </ul>
 
-                <div class="final-result">
-                    <span class="result-label">Valor Final:</span>
-                    <span id="finalAmount" class="result-value">R$ 0,00</span>
+                <div class="middle-result">
+                    <span>Valor Líquido Total:</span>
+                    <strong id="valLiqTotal">R$ 0,00</strong>
                 </div>
-                <div id="debtAlert" class="debt-alert hidden">
-                    Atenção: O saldo final é negativo (Devedor).
+
+                <div class="comparison-container">
+                    <div class="result-box pj-box">
+                        <span class="box-title">PJ (Padrão)</span>
+                        <span class="box-desc">Líquido - Dívida</span>
+                        <div class="box-value" id="finalPJ">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-box rpa-box">
+                        <span class="box-title">Com RPA</span>
+                        <span class="box-desc">Deduzindo RPA (11%) e ISS (5%)</span>
+                        <div class="box-value" id="finalRPA">R$ 0,00</div>
+                        <small class="box-label">Valor Pago p/ Trader</small>
+                    </div>
                 </div>
+
             </section>
         </div>
     </main>

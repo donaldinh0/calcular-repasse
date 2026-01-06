@@ -1,7 +1,9 @@
 // --- Taxas Configuráveis ---
 const TAXAS = {
-    PJ: { ir: 0.20, mesa: 0.10 },
-    PF: { ir: 0.20, mesa: 0.10, rpa: 0.11, iss: 0.05 }
+    ir: 0.20,
+    mesa: 0.10,
+    rpa: 0.11,
+    iss: 0.05
 };
 
 // --- Formatadores ---
@@ -17,91 +19,67 @@ function getInputValue(id) {
     return value ? parseFloat(value) : 0;
 }
 
-// --- Lógica Principal (Cascata) ---
+// --- Lógica Principal ---
 function calcularResultado() {
     // 1. Entradas
-    let baseCalculo = getInputValue('lucroLiquido'); // Começa com o Lucro Líquido inserido
+    let resultadoMensal = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
-    const tipoContrato = document.querySelector('input[name="contract-type"]:checked').value;
     
-    // Variáveis de controle
-    const taxasAtuais = TAXAS[tipoContrato];
+    // Lista para o extrato visual
     let detalhesExtrato = [];
     
-    // Adiciona linha inicial
-    detalhesExtrato.push({ label: "Entrada (Lucro Líquido)", valor: baseCalculo, tipo: "bruto" });
+    // --- PASSO 1: Cálculo até o "Valor Líquido Total" ---
+    // Início
+    detalhesExtrato.push({ label: "Resultado Mensal", valor: resultadoMensal, tipo: "bruto" });
 
-    // --- PASSO 1: Imposto de Renda (20% sobre a entrada) ---
-    // Nota: O cálculo é sobre o valor cheio, mas subtraído do montante.
-    const valorIR = baseCalculo * taxasAtuais.ir;
-    baseCalculo -= valorIR; // Atualiza o saldo
-    detalhesExtrato.push({ 
-        label: `(-) Imposto de Renda (20%)`, 
-        valor: -valorIR, 
-        tipo: "desconto" 
-    });
+    // 20% IR
+    const valorIR = resultadoMensal * TAXAS.ir;
+    let baseAposIR = resultadoMensal - valorIR;
+    detalhesExtrato.push({ label: `(-) Imposto de Renda (20%)`, valor: -valorIR, tipo: "desconto" });
 
-    // --- PASSO 2: Lucro da Mesa (10% sobre o que sobrou do IR) ---
-    const valorMesa = baseCalculo * taxasAtuais.mesa;
-    baseCalculo -= valorMesa; // Atualiza o saldo
-    detalhesExtrato.push({ 
-        label: `(-) Lucro da Mesa (10% do restante)`, 
-        valor: -valorMesa, 
-        tipo: "desconto" 
-    });
+    // 10% Mesa (sobre o restante após IR)
+    const valorMesa = baseAposIR * TAXAS.mesa;
+    let valorLiquidoTotal = baseAposIR - valorMesa;
+    detalhesExtrato.push({ label: `(-) Lucro da Mesa (10%)`, valor: -valorMesa, tipo: "desconto" });
 
-    // Subtotal para visualização (Lucro do Trader antes da dívida)
-    // Se quiser mostrar essa linha, descomente abaixo:
-    // detalhesExtrato.push({ label: "Subtotal (Trader)", valor: baseCalculo, tipo: "neutro" });
 
-    // --- PASSO 3: Saldo Devedor ---
+    // --- PASSO 2: Aplicação do Saldo Devedor ---
+    // O saldo devedor é aplicado sobre o Valor Líquido Total
+    let saldoAposDivida = valorLiquidoTotal - saldoDevedor;
+
+    // Se houver dívida, mostramos no extrato apenas para visualização, 
+    // mas o cálculo final será separado nos boxes.
     if (saldoDevedor > 0) {
-        baseCalculo -= saldoDevedor;
-        detalhesExtrato.push({ 
-            label: "(-) Abatimento Saldo Devedor", 
-            valor: -saldoDevedor, 
-            tipo: "desconto" 
-        });
+         detalhesExtrato.push({ label: "(-) Saldo Devedor", valor: -saldoDevedor, tipo: "desconto" });
     }
 
-    // --- PASSO 4: Taxas PF (RPA e ISS) sobre o SALDO FINAL ---
-    // A lógica aqui segue sua ordem: desconta sobre o valor que sobrou (mesmo se for negativo)
-    if (tipoContrato === 'PF') {
-        // Usamos Math.abs() para calcular a taxa sobre o tamanho do valor, 
-        // mas subtraímos para descontar.
-        const baseParaTaxas = Math.abs(baseCalculo); 
+    // --- PASSO 3: Cálculo do cenário RPA ---
+    // RPA e ISS incidem sobre o valor que sobrou (ou aumentam a dívida)
+    // Usamos o módulo (abs) para calcular a taxa sobre o montante, independente se é dívida ou lucro.
+    const baseParaTaxas = Math.abs(saldoAposDivida);
+    
+    const descontoRPA = baseParaTaxas * TAXAS.rpa;
+    const descontoISS = baseParaTaxas * TAXAS.iss;
+    
+    const resultadoFinalRPA = saldoAposDivida - descontoRPA - descontoISS;
 
-        const valorRPA = baseParaTaxas * taxasAtuais.rpa;
-        baseCalculo -= valorRPA;
-        detalhesExtrato.push({ 
-            label: `(-) RPA (11% do saldo)`, 
-            valor: -valorRPA, 
-            tipo: "desconto" 
-        });
-
-        const valorISS = baseParaTaxas * taxasAtuais.iss;
-        baseCalculo -= valorISS;
-        detalhesExtrato.push({ 
-            label: `(-) ISS (5% do saldo)`, 
-            valor: -valorISS, 
-            tipo: "desconto" 
-        });
-    }
-
-    // 5. Renderizar
-    renderizarResultados(detalhesExtrato, baseCalculo);
+    // --- Renderização ---
+    renderizarResultados(detalhesExtrato, valorLiquidoTotal, saldoAposDivida, resultadoFinalRPA);
 }
 
-// --- Interface ---
-function renderizarResultados(extrato, valorFinal) {
+function renderizarResultados(extrato, valLiquidoTotal, finalPJ, finalRPA) {
     const resultsSection = document.getElementById('resultsSection');
     const statementList = document.getElementById('statementList');
-    const finalAmountEl = document.getElementById('finalAmount');
-    const finalResultCard = document.querySelector('.final-result');
-    const debtAlert = document.getElementById('debtAlert');
+    
+    // Elementos de Valor
+    const elValLiqTotal = document.getElementById('valLiqTotal');
+    const elFinalPJ = document.getElementById('finalPJ');
+    const elFinalRPA = document.getElementById('finalRPA');
 
+    // Limpa lista
     statementList.innerHTML = '';
 
+    // Gera lista do extrato
     extrato.forEach(item => {
         const li = document.createElement('li');
         li.className = `statement-item is-${item.tipo}`;
@@ -112,23 +90,24 @@ function renderizarResultados(extrato, valorFinal) {
         statementList.appendChild(li);
     });
 
-    finalAmountEl.textContent = formatarMoeda(valorFinal);
-    resultsSection.classList.remove('hidden');
+    // Atualiza Valores
+    elValLiqTotal.textContent = formatarMoeda(valLiquidoTotal);
+    
+    elFinalPJ.textContent = formatarMoeda(finalPJ);
+    if(finalPJ < 0) elFinalPJ.classList.add('is-negative');
+    else elFinalPJ.classList.remove('is-negative');
 
-    if (valorFinal < 0) {
-        finalResultCard.classList.add('negative-balance');
-        debtAlert.classList.remove('hidden');
-        document.querySelector('.result-label').textContent = "Saldo Devedor Final:";
-    } else {
-        finalResultCard.classList.remove('negative-balance');
-        debtAlert.classList.add('hidden');
-        document.querySelector('.result-label').textContent = "Valor Líquido a Receber:";
-    }
+    elFinalRPA.textContent = formatarMoeda(finalRPA);
+    if(finalRPA < 0) elFinalRPA.classList.add('is-negative');
+    else elFinalRPA.classList.remove('is-negative');
+
+    // Mostra resultado
+    resultsSection.classList.remove('hidden');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    ['lucroLiquido', 'saldoDevedor'].forEach(id => {
+    ['resultadoMensal', 'saldoDevedor'].forEach(id => {
         document.getElementById(id).addEventListener('keypress', (e) => {
             if (e.key === 'Enter') calcularResultado();
         });
