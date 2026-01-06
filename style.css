@@ -60,7 +60,7 @@ body::before {
     opacity: 0.1; /* 0.1 = 10% visível. Tente entre 0.05 e 0.2 */
     
     /* Opcional: Deixa a imagem em preto e branco para ficar mais sóbrio */
-    filter: grayscale(100%); 
+    filter: grayscale(50%); 
     /* Opcional: Adiciona um desfoque para ficar mais suave */
     /* filter: grayscale(100%) blur(2px); */
 }
