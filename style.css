@@ -1,32 +1,36 @@
 :root {
+    /* --- Link da Imagem de Fundo --- */
+    --bg-image-url: url('tsr1.jpg'); 
+
     /* --- Paleta Dark Mode (Cyber/Slate) --- */
-    --primary-color: #3b82f6;      /* Azul vibrante */
-    --primary-hover: #2563eb;      /* Azul um pouco mais escuro no hover */
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
     
-    --success-color: #4ade80;      /* Verde neon suave */
-    --success-bg: rgba(74, 222, 128, 0.1); /* Fundo verde transparente */
+    --success-color: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.1);
     
-    --danger-color: #f87171;       /* Vermelho suave */
-    --danger-bg: rgba(248, 113, 113, 0.1); /* Fundo vermelho transparente */
+    --danger-color: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.1);
     
-    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); /* Fundo da página bem escuro */
-    --card-bg: #1e293b;            /* Cartão cinza escuro */
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --card-bg: #1e293b;
     
-    --text-main: #f1f5f9;          /* Texto quase branco */
-    --text-muted: #94a3b8;         /* Texto cinza claro */
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
     
-    --border-color: #334155;       /* Bordas sutis */
-    --input-bg: #0f172a;           /* Fundo do input mais escuro que o cartão */
+    --border-color: #334155;
+    --input-bg: #0f172a;
     
     --radius-md: 12px;
     --radius-sm: 8px;
-    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3); /* Sombras mais fortes */
+    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: 'Inter', sans-serif;
+    /* Mantemos o gradiente original como base/fallback */
     background: var(--bg-gradient);
     color: var(--text-main);
     min-height: 100vh;
@@ -34,6 +38,31 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    position: relative; /* Necessário para o posicionamento do fundo */
+}
+
+/* --- NOVO: Camada da Imagem de Fundo --- */
+body::before {
+    content: "";
+    position: fixed; /* Fixa a imagem para ela não rolar com a página */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Joga para trás de tudo */
+
+    background-image: var(--bg-image-url);
+    background-size: cover; /* Faz a imagem cobrir toda a tela sem distorcer */
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* --- AJUSTE AQUI A INTENSIDADE --- */
+    opacity: 0.1; /* 0.1 = 10% visível. Tente entre 0.05 e 0.2 */
+    
+    /* Opcional: Deixa a imagem em preto e branco para ficar mais sóbrio */
+    filter: grayscale(100%); 
+    /* Opcional: Adiciona um desfoque para ficar mais suave */
+    /* filter: grayscale(100%) blur(2px); */
 }
 
 .container { width: 100%; max-width: 500px; }
@@ -43,7 +72,9 @@ body {
     padding: 2rem;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color); /* Borda fina para destacar do fundo */
+    border: 1px solid var(--border-color);
+    /* Adiciona um leve backdrop-filter para o cartão destacar do fundo */
+    backdrop-filter: blur(10px); 
 }
 
 .card-header { text-align: center; margin-bottom: 2rem; }
@@ -61,7 +92,7 @@ body {
     width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid var(--border-color); border-radius: var(--radius-sm);
     font-family: 'Inter', sans-serif; font-size: 1rem;
-    background: var(--input-bg); color: var(--text-main); /* Texto do input branco */
+    background: var(--input-bg); color: var(--text-main);
     transition: all 0.2s; outline: none;
 }
 
@@ -70,7 +101,6 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
 }
 
-/* Remove setas do input number */
 input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .cta-button {
@@ -111,7 +141,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 .help-icon {
     display: inline-flex; justify-content: center; align-items: center;
     width: 20px; height: 20px;
-    background: #334155; /* Fundo do ícone escuro */
+    background: #334155;
     color: var(--text-muted);
     border-radius: 50%; font-size: 12px; font-weight: 700;
     cursor: pointer; transition: all 0.2s; user-select: none;
@@ -122,23 +152,22 @@ input:checked + .slider:before { transform: translateX(18px); }
 /* Balão do Tooltip */
 .tooltip-text {
     visibility: hidden; width: 280px;
-    background-color: #0f172a; /* Fundo do balão quase preto */
+    background-color: #0f172a;
     color: #e2e8f0;
     text-align: left; border-radius: 8px; padding: 12px;
     position: absolute; z-index: 10;
     bottom: 135%; left: 50%; transform: translateX(-90%);
     font-size: 0.75rem; line-height: 1.4; font-weight: 400;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-color); /* Borda para destacar */
+    border: 1px solid var(--border-color);
     opacity: 0; transition: opacity 0.3s;
 }
 
 .tooltip-text::after {
     content: ""; position: absolute; top: 100%; right: 20px;
     border-width: 6px; border-style: solid;
-    border-color: var(--border-color) transparent transparent transparent; /* Cor da seta igual borda */
+    border-color: var(--border-color) transparent transparent transparent;
 }
-/* Correção visual da seta para coincidir com fundo */
 .tooltip-text::before {
     content: ""; position: absolute; top: 100%; right: 20px; margin-top: -1px;
     border-width: 6px; border-style: solid;
@@ -169,7 +198,7 @@ input:checked + .slider:before { transform: translateX(18px); }
 
 /* Subtotal Dark */
 .item-subtotal { 
-    background-color: #334155; /* Cor de destaque escura */
+    background-color: #334155;
     font-weight: 600; color: #fff; 
 }
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
@@ -179,7 +208,7 @@ input:checked + .slider:before { transform: translateX(18px); }
     text-align: center; padding: 1.5rem;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    background: transparent; /* Fundo transparente para assumir a cor da classe */
+    background: transparent;
 }
 
 .final-label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
