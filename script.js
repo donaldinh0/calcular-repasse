@@ -10,33 +10,24 @@ function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 
-// Formata o campo ENQUANTO você digita
 function aplicarMascaraMoeda(event) {
     const input = event.target;
     let valor = input.value;
-    
-    // Remove tudo que não for número
     valor = valor.replace(/\D/g, "");
-    
     if (valor === "") {
         input.value = "";
         return;
     }
-
-    // Converte (ex: 30000 -> 300.00) e formata pt-BR
     valor = (parseInt(valor) / 100).toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
     });
-
     input.value = valor;
 }
 
-// Converte string formatada "30.000,00" para float JS
 function getInputValue(id) {
     const value = document.getElementById(id).value;
     if (!value) return 0;
-    // Remove pontos de milhar, troca vírgula por ponto
     const numeroLimpo = value.replace(/\./g, "").replace(",", ".");
     return parseFloat(numeroLimpo);
 }
@@ -45,8 +36,6 @@ function getInputValue(id) {
 function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
-    const checkRPA = document.getElementById('checkRPA');
-    const usaRPA = checkRPA.checked; 
     
     let extratoHTML = '';
 
@@ -69,30 +58,50 @@ function calcularResultado() {
     // Subtotal 2 (Lucro do Trader)
     extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // 4. Dívida
+    // 4. Dívida (Obrigatória na conta)
     if (saldoDevedor > 0) {
         valorAtual -= saldoDevedor;
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // 5. RPA
-    if (usaRPA) {
-        const valorAbsoluto = Math.abs(valorAtual);
-        const valorRPA = valorAbsoluto * TAXAS.rpa;
-        const valorISS = valorAbsoluto * TAXAS.iss;
-        const totalTaxasRPA = valorRPA + valorISS;
+    // --- DECISÃO FINAL: Positivo ou Negativo? ---
+    const valorLiquidoFinal = valorAtual; // Esse é o valor Base (PJ)
 
-        if (valorAtual >= 0) {
-            valorAtual -= totalTaxasRPA;
-        } else {
-            valorAtual += totalTaxasRPA; 
-        }
+    // Renderiza a lista comum a todos
+    document.getElementById('statementList').innerHTML = extratoHTML;
+
+    const resultsSection = document.getElementById('resultsSection');
+    const negativeContainer = document.getElementById('negativeResultContainer');
+    const positiveContainer = document.getElementById('positiveResultContainer');
+
+    // Mostra a seção principal
+    resultsSection.classList.remove('hidden');
+
+    if (valorLiquidoFinal < 0) {
+        // --- CENÁRIO NEGATIVO ---
+        // Mostra só o card vermelho, esconde as opções
+        negativeContainer.classList.remove('hidden');
+        positiveContainer.classList.add('hidden');
+
+        document.getElementById('valDevedorFinal').textContent = formatarMoeda(valorLiquidoFinal);
         
-        extratoHTML += criarLinha("(-) Desconto RPA (11%)", -valorRPA, "desconto");
-        extratoHTML += criarLinha("(-) Desconto ISS (5%)", -valorISS, "desconto");
-    }
+    } else {
+        // --- CENÁRIO POSITIVO ---
+        // Mostra as opções PJ/PF, esconde o card vermelho
+        negativeContainer.classList.add('hidden');
+        positiveContainer.classList.remove('hidden');
 
-    renderizar(extratoHTML, valorAtual, usaRPA);
+        // Cálculo PJ (é o próprio líquido)
+        document.getElementById('valFinalPJ').textContent = formatarMoeda(valorLiquidoFinal);
+
+        // Cálculo PF (Líquido - RPA - ISS)
+        const valorAbsoluto = valorLiquidoFinal; 
+        const descRPA = valorAbsoluto * TAXAS.rpa;
+        const descISS = valorAbsoluto * TAXAS.iss;
+        const finalPF = valorLiquidoFinal - descRPA - descISS;
+
+        document.getElementById('valFinalPF').textContent = formatarMoeda(finalPF);
+    }
 }
 
 function criarLinha(label, valor, tipo) {
@@ -104,40 +113,8 @@ function criarLinha(label, valor, tipo) {
     `;
 }
 
-function renderizar(htmlLista, valorFinal, usaRPA) {
-    const resultsSection = document.getElementById('resultsSection');
-    const statementList = document.getElementById('statementList');
-    const valorFinalDisplay = document.getElementById('valorFinalDisplay');
-    const finalCard = document.querySelector('.final-result-card');
-    const labelResultado = document.getElementById('labelResultado');
-    const rpaHint = document.getElementById('rpaHint');
-
-    statementList.innerHTML = htmlLista;
-    valorFinalDisplay.textContent = formatarMoeda(valorFinal);
-    
-    if (valorFinal >= 0) {
-        finalCard.className = 'final-result-card text-green';
-        labelResultado.textContent = "Valor a Receber";
-    } else {
-        finalCard.className = 'final-result-card text-red';
-        labelResultado.textContent = "Seu saldo devedor atual é de:";
-    }
-
-    rpaHint.classList.remove('hidden'); 
-    if (usaRPA) {
-        rpaHint.textContent = "(Com descontos de RPA e ISS aplicados)";
-    } else {
-        rpaHint.textContent = "(Sem descontos de RPA e ISS aplicados)";
-    }
-
-    resultsSection.classList.remove('hidden');
-}
-
 // --- Inicialização ---
 document.addEventListener('DOMContentLoaded', () => {
-    const checkRPA = document.getElementById('checkRPA');
-    if(checkRPA) checkRPA.checked = false;
-
     const inputsMoeda = document.querySelectorAll('.money-input');
     inputsMoeda.forEach(input => {
         input.addEventListener('input', aplicarMascaraMoeda);
@@ -147,23 +124,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
-    
-    checkRPA.addEventListener('change', () => {
-        if (!document.getElementById('resultsSection').classList.contains('hidden')) {
-            calcularResultado();
-        }
-    });
 
-    // Tooltip Mobile Logic
+    // Tooltip Mobile Logic (agora dentro do card PF)
     const btnHelp = document.getElementById('btnHelp');
-    const tooltipText = document.querySelector('.tooltip-text');
-
-    btnHelp.addEventListener('click', (e) => {
-        e.stopPropagation(); 
-        tooltipText.classList.toggle('show-tooltip');
-    });
+    
+    if (btnHelp) {
+        btnHelp.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            const tooltip = btnHelp.nextElementSibling; // Pega o div .tooltip-text
+            if(tooltip) tooltip.classList.toggle('show-tooltip');
+        });
+    }
 
     document.addEventListener('click', () => {
-        tooltipText.classList.remove('show-tooltip');
+        const allTooltips = document.querySelectorAll('.tooltip-text');
+        allTooltips.forEach(t => t.classList.remove('show-tooltip'));
     });
 });

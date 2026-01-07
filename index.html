@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Repasse TSR</title>
+    <title>Calculadora do Trader</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -43,33 +43,44 @@
                 
                 <div class="results-header">
                     <h2>Demonstrativo</h2>
-                    
-                    <div class="rpa-toggle-wrapper">
-                        <div class="toggle-group">
-                            <label class="switch">
-                                <input type="checkbox" id="checkRPA">
-                                <span class="slider round"></span>
-                            </label>
-                            <span class="toggle-label">Emite RPA?</span>
-                        </div>
-
-                        <div class="tooltip-container">
-                            <span class="help-icon" id="btnHelp">?</span>
-                            <div class="tooltip-text">
-                                O RPA (Recibo de Pagamento Autônomo) é um documento fiscal que formaliza pagamentos a pessoas físicas (autônomos) por serviços prestados a empresas ou outras pessoas físicas, sem vínculo empregatício, funcionando como uma nota fiscal para quem não tem CNPJ, sendo o contratante responsável por emitir, calcular e recolher tributos como INSS e IRRF. Ele detalha os dados das partes, o serviço, valores brutos, descontos (INSS, IRRF, ISS) e o valor líquido a ser pago, sendo essencial para comprovar a transação e o recolhimento fiscal.
-                            </div>
-                        </div>
-                    </div>
                 </div>
                 
                 <ul id="statementList" class="statement-list">
                    </ul>
 
-                <div class="final-result-card">
-                    <span id="labelResultado" class="final-label">Valor a Receber</span>
+                <div id="negativeResultContainer" class="hidden">
+                    <div class="final-result-card text-red">
+                        <span class="final-label">Seu saldo devedor atual é de:</span>
+                        <strong id="valDevedorFinal">R$ 0,00</strong>
+                        <small>(Valor acumulado para o próximo mês)</small>
+                    </div>
+                </div>
+
+                <div id="positiveResultContainer" class="comparison-container hidden">
                     
-                    <strong id="valorFinalDisplay">R$ 0,00</strong>
-                    <small id="rpaHint">(Sem descontos de RPA e ISS aplicados)</small>
+                    <div class="option-card pj-card">
+                        <span class="option-title">Opção PJ</span>
+                        <span class="option-desc">Sem descontos de RPA/ISS</span>
+                        <div class="option-value" id="valFinalPJ">R$ 0,00</div>
+                        <small class="option-note">Valor Líquido</small>
+                    </div>
+
+                    <div class="option-card pf-card">
+                        <div class="card-top-row">
+                            <span class="option-title">Opção PF</span>
+                            <div class="tooltip-container">
+                                <span class="help-icon" id="btnHelp">?</span>
+                                <div class="tooltip-text">
+                                    O RPA (Recibo de Pagamento Autônomo) é um documento fiscal que formaliza pagamentos a pessoas físicas (autônomos). Inclui descontos de 11% (INSS) e 5% (ISS) sobre o valor líquido. O contratante é responsável pelo recolhimento dos tributos.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <span class="option-desc">Com descontos de RPA e ISS</span>
+                        <div class="option-value" id="valFinalPF">R$ 0,00</div>
+                        <small class="option-note">Valor Líquido</small>
+                    </div>
+
                 </div>
 
             </section>

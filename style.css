@@ -1,17 +1,16 @@
 :root {
     /* --- Link da Imagem de Fundo --- */
-    /* Você pode trocar este link pela URL da sua própria imagem depois */
     --bg-image-url: url('tsr1.jpg');
 
-    /* --- Paleta Dark Mode (Cyber/Slate) --- */
+    /* --- Paleta Dark Mode --- */
     --primary-color: #3b82f6;
-    --primary-hover: #2563eb;
+    --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     
     --success-color: #4ade80;
-    --success-bg: rgba(74, 222, 128, 0.1);
+    --success-bg: rgba(74, 222, 128, 0.1); /* Fundo verde transparente */
     
     --danger-color: #f87171;
-    --danger-bg: rgba(248, 113, 113, 0.1);
+    --danger-bg: rgba(248, 113, 113, 0.1); /* Fundo vermelho transparente */
     
     --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     --card-bg: #1e293b;
@@ -31,7 +30,6 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    /* Mantemos o gradiente original como base/fallback */
     background: var(--bg-gradient);
     color: var(--text-main);
     min-height: 100vh;
@@ -39,150 +37,56 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
-    position: relative; /* Necessário para o posicionamento do fundo */
+    position: relative;
 }
 
-/* --- NOVO: Camada da Imagem de Fundo --- */
 body::before {
-    content: "";
-    position: fixed; /* Fixa a imagem para ela não rolar com a página */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Joga para trás de tudo */
-
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
     background-image: var(--bg-image-url);
-    background-size: cover; /* Faz a imagem cobrir toda a tela sem distorcer */
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    /* --- AJUSTE AQUI A INTENSIDADE --- */
-    opacity: 0.1; /* 0.1 = 10% visível. Tente entre 0.05 e 0.2 */
-    
-    /* Deixa a imagem em preto e branco para ficar mais sóbrio */
-    filter: grayscale(10%); 
-    
+    background-size: cover; background-position: center center; background-repeat: no-repeat;
+    opacity: 0.1; filter: grayscale(10%); 
 }
 
-.container { width: 100%; max-width: 500px; }
+.container { width: 100%; max-width: 600px; } /* Aumentei um pouco para caber os dois cards */
 
 .calculator-card {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
-    /* Adiciona um leve backdrop-filter para o cartão destacar do fundo */
-    backdrop-filter: blur(10px); 
+    background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); backdrop-filter: blur(10px); 
 }
 
 .card-header { text-align: center; margin-bottom: 2rem; }
 .card-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
 .card-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
 
-/* --- Inputs --- */
+/* Inputs */
 .input-group { margin-bottom: 1.25rem; }
 .input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted); }
 
 .currency-wrapper { position: relative; display: flex; align-items: center; }
 .currency-symbol { position: absolute; left: 1rem; color: var(--text-muted); font-weight: 500; }
-
 .currency-wrapper input {
     width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid var(--border-color); border-radius: var(--radius-sm);
     font-family: 'Inter', sans-serif; font-size: 1rem;
-    background: var(--input-bg); color: var(--text-main);
-    transition: all 0.2s; outline: none;
+    background: var(--input-bg); color: var(--text-main); transition: all 0.2s; outline: none;
 }
+.currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
-.currency-wrapper input:focus { 
-    border-color: var(--primary-color); 
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); 
-}
-
-input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
+/* Botão */
 .cta-button {
-    width: 100%; padding: 0.85rem; background: var(--primary-color);
+    width: 100%; padding: 1rem; margin-top: 1rem; background: var(--primary-gradient);
     color: white; border: none; border-radius: var(--radius-sm);
-    font-size: 1rem; font-weight: 600; cursor: pointer; transition: background-color 0.2s; margin-top: 0.5rem;
+    font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
-.cta-button:hover { background: var(--primary-hover); }
+.cta-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); filter: brightness(1.1); }
+.cta-button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4); }
 
-/* --- Resultados --- */
-.hidden { display: none; }
+/* Resultados e Lista */
+.hidden { display: none !important; } /* Important para garantir o toggle */
 .separator { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
+.results-header h2 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem; }
 
-.results-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;
-}
-.results-header h2 { font-size: 1.1rem; color: var(--text-main); margin: 0; }
-
-/* --- Toggle Group e Tooltip --- */
-.rpa-toggle-wrapper { display: flex; align-items: center; gap: 8px; }
-.toggle-group { display: flex; align-items: center; gap: 8px; }
-
-.toggle-label { font-size: 0.9rem; font-weight: 500; color: var(--text-main); }
-.switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-
-/* Slider do Switch */
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; }
-.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; }
-input:checked + .slider { background-color: var(--primary-color); }
-input:checked + .slider:before { transform: translateX(18px); }
-.slider.round { border-radius: 22px; }
-.slider.round:before { border-radius: 50%; }
-
-/* Ícone de Ajuda (?) */
-.tooltip-container { position: relative; display: inline-block; }
-
-.help-icon {
-    display: inline-flex; justify-content: center; align-items: center;
-    width: 20px; height: 20px;
-    background: #334155;
-    color: var(--text-muted);
-    border-radius: 50%; font-size: 12px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s; user-select: none;
-}
-
-.help-icon:hover { background: var(--primary-color); color: white; }
-
-/* Balão do Tooltip */
-.tooltip-text {
-    visibility: hidden; width: 280px;
-    background-color: #0f172a;
-    color: #e2e8f0;
-    text-align: left; border-radius: 8px; padding: 12px;
-    position: absolute; z-index: 10;
-    bottom: 135%; left: 50%; transform: translateX(-90%);
-    font-size: 0.75rem; line-height: 1.4; font-weight: 400;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-color);
-    opacity: 0; transition: opacity 0.3s;
-}
-
-.tooltip-text::after {
-    content: ""; position: absolute; top: 100%; right: 20px;
-    border-width: 6px; border-style: solid;
-    border-color: var(--border-color) transparent transparent transparent;
-}
-.tooltip-text::before {
-    content: ""; position: absolute; top: 100%; right: 20px; margin-top: -1px;
-    border-width: 6px; border-style: solid;
-    border-color: #0f172a transparent transparent transparent;
-    z-index: 1;
-}
-
-.tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
-.tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
-
-@media (max-width: 400px) {
-    .tooltip-text { width: 240px; transform: translateX(-85%); }
-}
-
-/* --- Lista Detalhada --- */
 .statement-list {
     list-style: none; border: 1px solid var(--border-color);
     border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1.5rem;
@@ -192,37 +96,73 @@ input:checked + .slider:before { transform: translateX(18px); }
     border-bottom: 1px solid var(--border-color); font-size: 0.9rem;
 }
 .statement-item:last-child { border-bottom: none; }
-
 .item-bruto .item-value { font-weight: 700; color: var(--text-main); }
 .item-desconto .item-value { color: var(--danger-color); }
-
-/* Subtotal Dark */
-.item-subtotal { 
-    background-color: #334155;
-    font-weight: 600; color: #fff; 
-}
+.item-subtotal { background-color: #334155; font-weight: 600; color: #fff; }
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
-/* --- Cartão Final --- */
+/* --- Cartão Único (Devedor) --- */
 .final-result-card {
     text-align: center; padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    background: transparent;
+    border: 1px solid var(--border-color); border-radius: var(--radius-md); background: transparent;
 }
-
 .final-label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
 .final-result-card strong { display: block; font-size: 1.75rem; font-weight: 800; }
 .final-result-card small { display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
+.text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }
 
-/* Cores de status (Ajustadas para Dark Mode) */
-.text-green { 
-    color: var(--success-color) !important; 
-    border-color: var(--success-color) !important; 
-    background: var(--success-bg) !important; 
+/* --- Comparação PJ vs PF --- */
+.comparison-container {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
 }
-.text-red { 
-    color: var(--danger-color) !important; 
-    border-color: var(--danger-color) !important; 
-    background: var(--danger-bg) !important; 
+
+.option-card {
+    position: relative; /* Necessário para o tooltip absolute */
+    padding: 1.25rem; border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    display: flex; flex-direction: column; justify-content: center;
+}
+
+.pj-card { background: var(--success-bg); border-color: var(--success-color); }
+.pf-card { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); } /* Fundo azulado */
+
+.card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+
+.option-title { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
+.option-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.2; }
+.option-value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
+.option-note { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; margin-top: 0.5rem; opacity: 0.7; }
+
+/* Cores dos valores */
+.pj-card .option-value { color: var(--success-color); }
+.pf-card .option-value { color: var(--primary-color); }
+
+/* --- Tooltip --- */
+.tooltip-container { position: relative; display: inline-block; }
+.help-icon {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 20px; height: 20px;
+    background: rgba(255,255,255,0.1); color: var(--text-main);
+    border-radius: 50%; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.help-icon:hover { background: var(--primary-color); color: white; }
+
+.tooltip-text {
+    visibility: hidden; width: 250px;
+    background-color: #0f172a; color: #e2e8f0;
+    text-align: left; border-radius: 8px; padding: 12px;
+    position: absolute; z-index: 100;
+    /* Ajuste para abrir "para a esquerda e para baixo" */
+    top: 100%; right: 0; margin-top: 10px;
+    font-size: 0.75rem; line-height: 1.4; font-weight: 400;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
+    opacity: 0; transition: opacity 0.3s;
+}
+
+.tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+.tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
+
+@media (max-width: 500px) {
+    .comparison-container { grid-template-columns: 1fr; } /* Um embaixo do outro no celular */
 }
