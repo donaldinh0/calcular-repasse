@@ -100,7 +100,7 @@ body::before {
 .item-subtotal { background-color: #334155; font-weight: 600; color: #fff; }
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
-/* --- Devedor Card --- */
+/* Devedor Card */
 .final-result-card {
     text-align: center; padding: 1.5rem;
     border: 1px solid var(--border-color); border-radius: var(--radius-md); background: transparent;
@@ -110,12 +110,9 @@ body::before {
 .final-result-card small { display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
 .text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }
 
-/* --- SELEÇÃO DE CONTRATO --- */
+/* SELEÇÃO DE CONTRATO */
 .selection-title { font-size: 1rem; color: var(--text-main); text-align: center; margin-bottom: 1rem; font-weight: 600; }
-
-.selection-buttons {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;
-}
+.selection-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
 
 .select-btn {
     padding: 0.75rem; border-radius: var(--radius-sm);
@@ -123,17 +120,13 @@ body::before {
     color: var(--text-muted); font-weight: 600; cursor: pointer;
     transition: all 0.2s;
 }
-
 .select-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
-
-/* Estilo Ativo (Selecionado) */
 .select-btn.active.pj-btn { background: var(--success-bg); border-color: var(--success-color); color: var(--success-color); }
 .select-btn.active.pf-btn { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
 
-/* --- PAINÉIS DE DETALHES --- */
+/* PAINÉIS DE DETALHES */
 .detail-box {
-    padding: 1.5rem; border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
+    padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);
     animation: fadeIn 0.3s ease-in-out;
 }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -143,21 +136,25 @@ body::before {
 
 .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
-
 .detail-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4; }
 
-.extra-list { list-style: none; margin-bottom: 1.5rem; }
-.extra-list li { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
-.val-red { color: var(--danger-color); font-weight: 600; }
-
-.final-value-row {
-    display: flex; justify-content: space-between; align-items: center;
-    padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
+/* NOVA CLASSE: LISTA INTERNA DOS CARDS */
+.inner-list { list-style: none; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.inner-list li { 
+    display: flex; justify-content: space-between; 
+    padding: 0.5rem 0; 
+    font-size: 0.9rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted);
 }
+.inner-list .val-neg { color: var(--danger-color); font-weight: 600; }
+.inner-list .val-pos { color: var(--text-main); font-weight: 600; }
+
+.final-value-row { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid rgba(255,255,255,0.1); }
 .final-value-row span { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; color: var(--text-main); }
 .final-value-row strong { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
-/* --- Tooltip --- */
+/* Tooltip */
 .tooltip-container { position: relative; display: inline-block; }
 .help-icon {
     display: inline-flex; justify-content: center; align-items: center;

@@ -5,7 +5,7 @@ const TAXAS = {
     iss: 0.05
 };
 
-// --- Funções de Formatação (Máscara) ---
+// --- Funções de Formatação ---
 function formatarMoeda(valor) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
@@ -37,88 +37,126 @@ function calcularResultado() {
     let valorAtual = getInputValue('resultadoMensal'); 
     const saldoDevedor = getInputValue('saldoDevedor');
     
+    // Lista Visual (O "Extrato" acima dos botões)
     let extratoHTML = '';
-
-    // 1. Mensal
     extratoHTML += criarLinha("Resultado Mensal", valorAtual, "bruto");
 
-    // 2. IR
     const valorIR = valorAtual * TAXAS.ir;
     valorAtual -= valorIR; 
     extratoHTML += criarLinha("(-) Imposto de Renda (20%)", -valorIR, "desconto");
     
-    // Subtotal 1
     extratoHTML += criarLinha("Resultado após IR", valorAtual, "subtotal");
 
-    // 3. Mesa
     const valorMesa = valorAtual * TAXAS.mesa;
     valorAtual -= valorMesa; 
     extratoHTML += criarLinha("(-) Lucro da Mesa (10%)", -valorMesa, "desconto");
 
-    // Subtotal 2 (Lucro do Trader)
     extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // 4. Dívida
     if (saldoDevedor > 0) {
         valorAtual -= saldoDevedor;
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
-    // --- DECISÃO FINAL: Positivo ou Negativo? ---
+    // Valor Líquido Base (PJ)
     const valorLiquidoFinal = valorAtual; 
 
     // Renderiza a lista comum
     document.getElementById('statementList').innerHTML = extratoHTML;
 
-    // Elementos de Controle
+    // Controle de Exibição
     const resultsSection = document.getElementById('resultsSection');
     const negativeContainer = document.getElementById('negativeResultContainer');
     const positiveSelectionContainer = document.getElementById('positiveSelectionContainer');
     
-    // Reseta visualização dos detalhes
     resetSelection();
-
     resultsSection.classList.remove('hidden');
 
     if (valorLiquidoFinal < 0) {
-        // --- CENÁRIO NEGATIVO ---
+        // Devedor
         negativeContainer.classList.remove('hidden');
         positiveSelectionContainer.classList.add('hidden');
         document.getElementById('valDevedorFinal').textContent = formatarMoeda(valorLiquidoFinal);
     } else {
-        // --- CENÁRIO POSITIVO ---
+        // Positivo
         negativeContainer.classList.add('hidden');
         positiveSelectionContainer.classList.remove('hidden');
 
-        // Prepara os dados (mas não mostra ainda, espera o clique)
-        prepararDadosPJ(valorLiquidoFinal);
-        prepararDadosPF(valorLiquidoFinal);
+        // PREPARA OS DADOS DETALHADOS (Passamos os valores originais para recalcular o visual)
+        prepararDadosPJ(getInputValue('resultadoMensal'), saldoDevedor);
+        prepararDadosPF(getInputValue('resultadoMensal'), saldoDevedor);
     }
 }
 
-function prepararDadosPJ(valorFinal) {
-    document.getElementById('valFinalPJ').textContent = formatarMoeda(valorFinal);
+// Monta o Card PJ Detalhado
+function prepararDadosPJ(brutoInicial, dividaInicial) {
+    let html = '';
+    let corrente = brutoInicial;
+
+    html += criarItemInner("Resultado Mensal", corrente, "pos");
+
+    const ir = brutoInicial * TAXAS.ir;
+    corrente -= ir;
+    html += criarItemInner("(-) Imposto de Renda", -ir, "neg");
+
+    const mesa = corrente * TAXAS.mesa;
+    corrente -= mesa;
+    html += criarItemInner("(-) Lucro da Mesa", -mesa, "neg");
+
+    if (dividaInicial > 0) {
+        corrente -= dividaInicial;
+        html += criarItemInner("(-) Saldo Devedor", -dividaInicial, "neg");
+    }
+
+    document.getElementById('listPJ').innerHTML = html;
+    document.getElementById('valFinalPJ').textContent = formatarMoeda(corrente);
 }
 
-function prepararDadosPF(valorFinal) {
-    const valorAbsoluto = valorFinal; 
-    const descRPA = valorAbsoluto * TAXAS.rpa;
-    const descISS = valorAbsoluto * TAXAS.iss;
-    const finalPF = valorFinal - descRPA - descISS;
+// Monta o Card PF Detalhado
+function prepararDadosPF(brutoInicial, dividaInicial) {
+    let html = '';
+    let corrente = brutoInicial;
 
-    document.getElementById('descRPA').textContent = formatarMoeda(-descRPA);
-    document.getElementById('descISS').textContent = formatarMoeda(-descISS);
-    document.getElementById('valFinalPF').textContent = formatarMoeda(finalPF);
+    // 1. Refaz o caminho básico
+    html += criarItemInner("Resultado Mensal", corrente, "pos");
+
+    const ir = brutoInicial * TAXAS.ir;
+    corrente -= ir;
+    html += criarItemInner("(-) Imposto de Renda", -ir, "neg");
+
+    const mesa = corrente * TAXAS.mesa;
+    corrente -= mesa;
+    html += criarItemInner("(-) Lucro da Mesa", -mesa, "neg");
+
+    if (dividaInicial > 0) {
+        corrente -= dividaInicial;
+        html += criarItemInner("(-) Saldo Devedor", -dividaInicial, "neg");
+    }
+
+    // 2. Adiciona RPA e ISS
+    // O valor base para RPA é o líquido atual (corrente)
+    const baseRPA = corrente;
+    
+    const valRPA = baseRPA * TAXAS.rpa;
+    const valISS = baseRPA * TAXAS.iss;
+    
+    corrente = corrente - valRPA - valISS;
+
+    html += criarItemInner("(-) RPA (11%)", -valRPA, "neg");
+    html += criarItemInner("(-) ISS (5%)", -valISS, "neg");
+
+    document.getElementById('listPF').innerHTML = html;
+    document.getElementById('valFinalPF').textContent = formatarMoeda(corrente);
 }
 
 function resetSelection() {
-    // Esconde detalhes e reseta botões
     document.getElementById('detailsPJ').classList.add('hidden');
     document.getElementById('detailsPF').classList.add('hidden');
     document.getElementById('btnSelectPJ').classList.remove('active');
     document.getElementById('btnSelectPF').classList.remove('active');
 }
 
+// Cria linha da lista principal (cinza)
 function criarLinha(label, valor, tipo) {
     return `
         <li class="statement-item item-${tipo}">
@@ -128,7 +166,16 @@ function criarLinha(label, valor, tipo) {
     `;
 }
 
-// --- Inicialização ---
+// Cria linha da lista interna dos cards (transparente)
+function criarItemInner(label, valor, tipoClass) {
+    return `
+        <li>
+            <span>${label}</span>
+            <span class="val-${tipoClass}">${formatarMoeda(valor)}</span>
+        </li>
+    `;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const inputsMoeda = document.querySelectorAll('.money-input');
     inputsMoeda.forEach(input => {
@@ -140,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
 
-    // --- LÓGICA DE SELEÇÃO DE BOTÕES ---
+    // Botões de Seleção
     const btnPJ = document.getElementById('btnSelectPJ');
     const btnPF = document.getElementById('btnSelectPF');
     const detailsPJ = document.getElementById('detailsPJ');
