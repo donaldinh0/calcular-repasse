@@ -58,50 +58,65 @@ function calcularResultado() {
     // Subtotal 2 (Lucro do Trader)
     extratoHTML += criarLinha("Lucro do Trader", valorAtual, "subtotal");
 
-    // 4. Dívida (Obrigatória na conta)
+    // 4. Dívida
     if (saldoDevedor > 0) {
         valorAtual -= saldoDevedor;
         extratoHTML += criarLinha("(-) Abatimento Saldo Devedor", -saldoDevedor, "desconto");
     }
 
     // --- DECISÃO FINAL: Positivo ou Negativo? ---
-    const valorLiquidoFinal = valorAtual; // Esse é o valor Base (PJ)
+    const valorLiquidoFinal = valorAtual; 
 
-    // Renderiza a lista comum a todos
+    // Renderiza a lista comum
     document.getElementById('statementList').innerHTML = extratoHTML;
 
+    // Elementos de Controle
     const resultsSection = document.getElementById('resultsSection');
     const negativeContainer = document.getElementById('negativeResultContainer');
-    const positiveContainer = document.getElementById('positiveResultContainer');
+    const positiveSelectionContainer = document.getElementById('positiveSelectionContainer');
+    
+    // Reseta visualização dos detalhes
+    resetSelection();
 
-    // Mostra a seção principal
     resultsSection.classList.remove('hidden');
 
     if (valorLiquidoFinal < 0) {
         // --- CENÁRIO NEGATIVO ---
-        // Mostra só o card vermelho, esconde as opções
         negativeContainer.classList.remove('hidden');
-        positiveContainer.classList.add('hidden');
-
+        positiveSelectionContainer.classList.add('hidden');
         document.getElementById('valDevedorFinal').textContent = formatarMoeda(valorLiquidoFinal);
-        
     } else {
         // --- CENÁRIO POSITIVO ---
-        // Mostra as opções PJ/PF, esconde o card vermelho
         negativeContainer.classList.add('hidden');
-        positiveContainer.classList.remove('hidden');
+        positiveSelectionContainer.classList.remove('hidden');
 
-        // Cálculo PJ (é o próprio líquido)
-        document.getElementById('valFinalPJ').textContent = formatarMoeda(valorLiquidoFinal);
-
-        // Cálculo PF (Líquido - RPA - ISS)
-        const valorAbsoluto = valorLiquidoFinal; 
-        const descRPA = valorAbsoluto * TAXAS.rpa;
-        const descISS = valorAbsoluto * TAXAS.iss;
-        const finalPF = valorLiquidoFinal - descRPA - descISS;
-
-        document.getElementById('valFinalPF').textContent = formatarMoeda(finalPF);
+        // Prepara os dados (mas não mostra ainda, espera o clique)
+        prepararDadosPJ(valorLiquidoFinal);
+        prepararDadosPF(valorLiquidoFinal);
     }
+}
+
+function prepararDadosPJ(valorFinal) {
+    document.getElementById('valFinalPJ').textContent = formatarMoeda(valorFinal);
+}
+
+function prepararDadosPF(valorFinal) {
+    const valorAbsoluto = valorFinal; 
+    const descRPA = valorAbsoluto * TAXAS.rpa;
+    const descISS = valorAbsoluto * TAXAS.iss;
+    const finalPF = valorFinal - descRPA - descISS;
+
+    document.getElementById('descRPA').textContent = formatarMoeda(-descRPA);
+    document.getElementById('descISS').textContent = formatarMoeda(-descISS);
+    document.getElementById('valFinalPF').textContent = formatarMoeda(finalPF);
+}
+
+function resetSelection() {
+    // Esconde detalhes e reseta botões
+    document.getElementById('detailsPJ').classList.add('hidden');
+    document.getElementById('detailsPF').classList.add('hidden');
+    document.getElementById('btnSelectPJ').classList.remove('active');
+    document.getElementById('btnSelectPF').classList.remove('active');
 }
 
 function criarLinha(label, valor, tipo) {
@@ -125,13 +140,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btnCalcular').addEventListener('click', calcularResultado);
 
-    // Tooltip Mobile Logic (agora dentro do card PF)
+    // --- LÓGICA DE SELEÇÃO DE BOTÕES ---
+    const btnPJ = document.getElementById('btnSelectPJ');
+    const btnPF = document.getElementById('btnSelectPF');
+    const detailsPJ = document.getElementById('detailsPJ');
+    const detailsPF = document.getElementById('detailsPF');
+
+    btnPJ.addEventListener('click', () => {
+        resetSelection();
+        btnPJ.classList.add('active');
+        detailsPJ.classList.remove('hidden');
+    });
+
+    btnPF.addEventListener('click', () => {
+        resetSelection();
+        btnPF.classList.add('active');
+        detailsPF.classList.remove('hidden');
+    });
+
+    // Tooltip Mobile
     const btnHelp = document.getElementById('btnHelp');
-    
     if (btnHelp) {
         btnHelp.addEventListener('click', (e) => {
             e.stopPropagation(); 
-            const tooltip = btnHelp.nextElementSibling; // Pega o div .tooltip-text
+            const tooltip = btnHelp.nextElementSibling; 
             if(tooltip) tooltip.classList.toggle('show-tooltip');
         });
     }

@@ -1,16 +1,15 @@
 :root {
-    /* --- Link da Imagem de Fundo --- */
-    --bg-image-url: url('tsr1.jpg');
+    --bg-image-url: url('fundo.jpg');
 
     /* --- Paleta Dark Mode --- */
     --primary-color: #3b82f6;
     --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
     
     --success-color: #4ade80;
-    --success-bg: rgba(74, 222, 128, 0.1); /* Fundo verde transparente */
+    --success-bg: rgba(74, 222, 128, 0.1);
     
     --danger-color: #f87171;
-    --danger-bg: rgba(248, 113, 113, 0.1); /* Fundo vermelho transparente */
+    --danger-bg: rgba(248, 113, 113, 0.1);
     
     --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     --card-bg: #1e293b;
@@ -44,10 +43,10 @@ body::before {
     content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
     background-image: var(--bg-image-url);
     background-size: cover; background-position: center center; background-repeat: no-repeat;
-    opacity: 0.1; filter: grayscale(10%); 
+    opacity: 0.1; filter: grayscale(100%); 
 }
 
-.container { width: 100%; max-width: 600px; } /* Aumentei um pouco para caber os dois cards */
+.container { width: 100%; max-width: 500px; }
 
 .calculator-card {
     background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
@@ -72,7 +71,7 @@ body::before {
 }
 .currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
-/* Botão */
+/* Botão Principal */
 .cta-button {
     width: 100%; padding: 1rem; margin-top: 1rem; background: var(--primary-gradient);
     color: white; border: none; border-radius: var(--radius-sm);
@@ -82,8 +81,8 @@ body::before {
 .cta-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); filter: brightness(1.1); }
 .cta-button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4); }
 
-/* Resultados e Lista */
-.hidden { display: none !important; } /* Important para garantir o toggle */
+/* Resultados */
+.hidden { display: none !important; }
 .separator { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
 .results-header h2 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem; }
 
@@ -101,7 +100,7 @@ body::before {
 .item-subtotal { background-color: #334155; font-weight: 600; color: #fff; }
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
-/* --- Cartão Único (Devedor) --- */
+/* --- Devedor Card --- */
 .final-result-card {
     text-align: center; padding: 1.5rem;
     border: 1px solid var(--border-color); border-radius: var(--radius-md); background: transparent;
@@ -111,31 +110,52 @@ body::before {
 .final-result-card small { display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
 .text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }
 
-/* --- Comparação PJ vs PF --- */
-.comparison-container {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+/* --- SELEÇÃO DE CONTRATO --- */
+.selection-title { font-size: 1rem; color: var(--text-main); text-align: center; margin-bottom: 1rem; font-weight: 600; }
+
+.selection-buttons {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;
 }
 
-.option-card {
-    position: relative; /* Necessário para o tooltip absolute */
-    padding: 1.25rem; border-radius: var(--radius-md);
+.select-btn {
+    padding: 0.75rem; border-radius: var(--radius-sm);
+    background: transparent; border: 1px solid var(--border-color);
+    color: var(--text-muted); font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+
+/* Estilo Ativo (Selecionado) */
+.select-btn.active.pj-btn { background: var(--success-bg); border-color: var(--success-color); color: var(--success-color); }
+.select-btn.active.pf-btn { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
+
+/* --- PAINÉIS DE DETALHES --- */
+.detail-box {
+    padding: 1.5rem; border-radius: var(--radius-md);
     border: 1px solid var(--border-color);
-    display: flex; flex-direction: column; justify-content: center;
+    animation: fadeIn 0.3s ease-in-out;
 }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.pj-card { background: var(--success-bg); border-color: var(--success-color); }
-.pf-card { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); } /* Fundo azulado */
+.pj-box { background: var(--success-bg); border-color: var(--success-color); }
+.pf-box { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); }
 
-.card-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem; }
+.detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
 
-.option-title { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
-.option-desc { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.75rem; line-height: 1.2; }
-.option-value { font-size: 1.4rem; font-weight: 800; color: var(--text-main); }
-.option-note { font-size: 0.7rem; text-transform: uppercase; font-weight: 600; margin-top: 0.5rem; opacity: 0.7; }
+.detail-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4; }
 
-/* Cores dos valores */
-.pj-card .option-value { color: var(--success-color); }
-.pf-card .option-value { color: var(--primary-color); }
+.extra-list { list-style: none; margin-bottom: 1.5rem; }
+.extra-list li { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem; color: var(--text-muted); }
+.val-red { color: var(--danger-color); font-weight: 600; }
+
+.final-value-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);
+}
+.final-value-row span { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; color: var(--text-main); }
+.final-value-row strong { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
 /* --- Tooltip --- */
 .tooltip-container { position: relative; display: inline-block; }
@@ -153,16 +173,11 @@ body::before {
     background-color: #0f172a; color: #e2e8f0;
     text-align: left; border-radius: 8px; padding: 12px;
     position: absolute; z-index: 100;
-    /* Ajuste para abrir "para a esquerda e para baixo" */
     top: 100%; right: 0; margin-top: 10px;
     font-size: 0.75rem; line-height: 1.4; font-weight: 400;
     box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
     opacity: 0; transition: opacity 0.3s;
 }
-
+.tooltip-text::after { content: ""; position: absolute; bottom: 100%; right: 5px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--border-color) transparent; }
 .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 .tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
-
-@media (max-width: 500px) {
-    .comparison-container { grid-template-columns: 1fr; } /* Um embaixo do outro no celular */
-}

@@ -56,29 +56,55 @@
                     </div>
                 </div>
 
-                <div id="positiveResultContainer" class="comparison-container hidden">
+                <div id="positiveSelectionContainer" class="hidden">
                     
-                    <div class="option-card pj-card">
-                        <span class="option-title">Opção PJ</span>
-                        <span class="option-desc">Sem descontos de RPA/ISS</span>
-                        <div class="option-value" id="valFinalPJ">R$ 0,00</div>
-                        <small class="option-note">Valor Líquido</small>
+                    <h3 class="selection-title">Selecione o Contrato:</h3>
+                    
+                    <div class="selection-buttons">
+                        <button id="btnSelectPJ" class="select-btn pj-btn">Contrato PJ</button>
+                        <button id="btnSelectPF" class="select-btn pf-btn">Contrato PF</button>
                     </div>
 
-                    <div class="option-card pf-card">
-                        <div class="card-top-row">
-                            <span class="option-title">Opção PF</span>
+                    <div id="detailsPJ" class="detail-box pj-box hidden">
+                        <div class="detail-header">
+                            <span>Resumo PJ</span>
+                        </div>
+                        <p class="detail-desc">
+                            No contrato PJ, não há incidência de taxas extras sobre o repasse.
+                        </p>
+                        
+                        <div class="final-value-row">
+                            <span>Valor Líquido:</span>
+                            <strong id="valFinalPJ">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <div id="detailsPF" class="detail-box pf-box hidden">
+                        <div class="detail-header">
+                            <span>Resumo PF</span>
                             <div class="tooltip-container">
                                 <span class="help-icon" id="btnHelp">?</span>
                                 <div class="tooltip-text">
-                                    O RPA (Recibo de Pagamento Autônomo) é um documento fiscal que formaliza pagamentos a pessoas físicas (autônomos). Inclui descontos de 11% (INSS) e 5% (ISS) sobre o valor líquido. O contratante é responsável pelo recolhimento dos tributos.
+                                    O RPA (Recibo de Pagamento Autônomo) formaliza pagamentos a autônomos. Inclui descontos de 11% (INSS) e 5% (ISS) sobre o valor líquido total.
                                 </div>
                             </div>
                         </div>
+
+                        <ul class="extra-list">
+                            <li>
+                                <span>(-) RPA (11%)</span>
+                                <span class="val-red" id="descRPA">R$ 0,00</span>
+                            </li>
+                            <li>
+                                <span>(-) ISS (5%)</span>
+                                <span class="val-red" id="descISS">R$ 0,00</span>
+                            </li>
+                        </ul>
                         
-                        <span class="option-desc">Com descontos de RPA e ISS</span>
-                        <div class="option-value" id="valFinalPF">R$ 0,00</div>
-                        <small class="option-note">Valor Líquido</small>
+                        <div class="final-value-row">
+                            <span>Valor Líquido:</span>
+                            <strong id="valFinalPF">R$ 0,00</strong>
+                        </div>
                     </div>
 
                 </div>
