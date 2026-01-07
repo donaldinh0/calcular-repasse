@@ -63,8 +63,8 @@ body::before {
     background-repeat: no-repeat;
 
     /* A imagem blendando com o fundo preto do HTML */
-    opacity: 0.15; /* Aumentei levemente para 15% para garantir visibilidade contra o preto */
-    filter: grayscale(10%); 
+    opacity: 0.05; /* Aumentei levemente para 15% para garantir visibilidade contra o preto */
+    filter: grayscale(5%); 
 }
 
 /* --- Camada de Gradiente (Sobre a imagem, mas atrás do conteúdo) --- */
@@ -76,7 +76,7 @@ body::after {
     width: 100%; height: 100%;
     z-index: -1;
     background: var(--bg-gradient);
-    opacity: 0.8; /* Controla o quão escuro o fundo fica sobre a imagem */
+    opacity: 0.5; /* Controla o quão escuro o fundo fica sobre a imagem */
     pointer-events: none;
 }
 
