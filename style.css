@@ -11,12 +11,13 @@
     --danger-color: #f87171;
     --danger-bg: rgba(248, 113, 113, 0.1);
     
+    /* Cores de fundo sólidas para evitar o "branco" */
+    --bg-solid: #0f172a; 
     --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    --card-bg: #1e293b;
     
+    --card-bg: #1e293b;
     --text-main: #f1f5f9;
     --text-muted: #94a3b8;
-    
     --border-color: #334155;
     --input-bg: #0f172a;
     
@@ -27,9 +28,16 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* --- CORREÇÃO DO FUNDO BRANCO MOBILE --- */
+html {
+    background-color: var(--bg-solid); /* Garante que o fundo base seja ESCURO */
+    min-height: 100%;
+}
+
 body {
     font-family: 'Inter', sans-serif;
-    background: var(--bg-gradient);
+    /* Removemos o gradiente daqui e deixamos transparente para ver a imagem */
+    background-color: transparent; 
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -37,20 +45,48 @@ body {
     align-items: center;
     padding: 20px;
     position: relative;
+    /* Previne rolagem horizontal no mobile */
+    overflow-x: hidden; 
 }
 
+/* --- Camada da Imagem de Fundo --- */
 body::before {
-    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    content: "";
+    position: fixed; /* Fixa na tela */
+    top: 0; left: 0; 
+    width: 100%; height: 100%; /* Garante cobertura total */
+    z-index: -2; /* Joga bem para trás */
+
     background-image: var(--bg-image-url);
-    background-size: cover; background-position: center center; background-repeat: no-repeat;
-    opacity: 0.1; filter: grayscale(10%); 
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+
+    /* A imagem blendando com o fundo preto do HTML */
+    opacity: 0.15; /* Aumentei levemente para 15% para garantir visibilidade contra o preto */
+    filter: grayscale(10%); 
 }
 
-.container { width: 100%; max-width: 500px; }
+/* --- Camada de Gradiente (Sobre a imagem, mas atrás do conteúdo) --- */
+/* Isso cria o efeito "Dark Mode" perfeito misturando imagem e cor */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    z-index: -1;
+    background: var(--bg-gradient);
+    opacity: 0.8; /* Controla o quão escuro o fundo fica sobre a imagem */
+    pointer-events: none;
+}
+
+.container { width: 100%; max-width: 500px; position: relative; z-index: 1; }
 
 .calculator-card {
     background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); backdrop-filter: blur(10px); 
+    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); 
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); /* Suporte para Safari/iOS */
 }
 
 .card-header { text-align: center; margin-bottom: 2rem; }
@@ -68,6 +104,8 @@ body::before {
     border: 1px solid var(--border-color); border-radius: var(--radius-sm);
     font-family: 'Inter', sans-serif; font-size: 1rem;
     background: var(--input-bg); color: var(--text-main); transition: all 0.2s; outline: none;
+    /* Previne zoom automático no iPhone ao clicar */
+    font-size: 16px; 
 }
 .currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
@@ -107,7 +145,6 @@ body::before {
 }
 .final-label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
 .final-result-card strong { display: block; font-size: 1.75rem; font-weight: 800; }
-.final-result-card small { display: block; margin-top: 0.5rem; color: var(--text-muted); font-size: 0.8rem; }
 .text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }
 
 /* SELEÇÃO DE CONTRATO */
@@ -136,7 +173,6 @@ body::before {
 
 .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
-.detail-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4; }
 
 /* LISTA INTERNA DOS CARDS */
 .inner-list { list-style: none; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -154,7 +190,7 @@ body::before {
 .final-value-row span { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; color: var(--text-main); }
 .final-value-row strong { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
-/* Tooltip */
+/* Tooltip Mobile */
 .tooltip-container { position: relative; display: inline-block; }
 .help-icon {
     display: inline-flex; justify-content: center; align-items: center;
@@ -178,3 +214,8 @@ body::before {
 .tooltip-text::after { content: ""; position: absolute; bottom: 100%; right: 5px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--border-color) transparent; }
 .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 .tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
+
+@media (max-width: 500px) {
+    .calculator-card { padding: 1.5rem; }
+    .tooltip-text { width: 220px; right: -10px; }
+}
