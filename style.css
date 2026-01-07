@@ -11,33 +11,35 @@
     --danger-color: #f87171;
     --danger-bg: rgba(248, 113, 113, 0.1);
     
-    /* Cores de fundo sólidas para evitar o "branco" */
+    /* Fundo Sólido (Segurança para Mobile) */
     --bg-solid: #0f172a; 
-    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     
-    --card-bg: #1e293b;
+    /* Gradiente que vai por cima da imagem (Vidro Fumê) */
+    --bg-overlay-gradient: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 100%);
+    
+    --card-bg: rgba(30, 41, 59, 0.7); /* Cartão mais translúcido para integrar com o fundo */
+    
     --text-main: #f1f5f9;
     --text-muted: #94a3b8;
-    --border-color: #334155;
-    --input-bg: #0f172a;
+    
+    --border-color: rgba(51, 65, 85, 0.6);
+    --input-bg: rgba(15, 23, 42, 0.8);
     
     --radius-md: 12px;
     --radius-sm: 8px;
-    --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* --- CORREÇÃO DO FUNDO BRANCO MOBILE --- */
 html {
-    background-color: var(--bg-solid); /* Garante que o fundo base seja ESCURO */
+    background-color: var(--bg-solid);
     min-height: 100%;
 }
 
 body {
     font-family: 'Inter', sans-serif;
-    /* Removemos o gradiente daqui e deixamos transparente para ver a imagem */
-    background-color: transparent; 
+    background-color: transparent;
     color: var(--text-main);
     min-height: 100vh;
     display: flex;
@@ -45,52 +47,53 @@ body {
     align-items: center;
     padding: 20px;
     position: relative;
-    /* Previne rolagem horizontal no mobile */
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
 
-/* --- Camada da Imagem de Fundo --- */
+/* --- CAMADA 1: A IMAGEM (Fundo) --- */
 body::before {
     content: "";
-    position: fixed; /* Fixa na tela */
-    top: 0; left: 0; 
-    width: 100%; height: 100%; /* Garante cobertura total */
-    z-index: -2; /* Joga bem para trás */
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -2;
 
     background-image: var(--bg-image-url);
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
 
-    /* A imagem blendando com o fundo preto do HTML */
-    opacity: 0.05; /* Aumentei levemente para 15% para garantir visibilidade contra o preto */
-    filter: grayscale(5%); 
+    /* AQUI ESTÁ A MÁGICA DO DESTAQUE */
+    opacity: 0.4; /* Aumentado para 40% de visibilidade */
+    filter: none; /* Sem filtro de cinza = Cores originais */
 }
 
-/* --- Camada de Gradiente (Sobre a imagem, mas atrás do conteúdo) --- */
-/* Isso cria o efeito "Dark Mode" perfeito misturando imagem e cor */
+/* --- CAMADA 2: O FILTRO ESCURO (Vidro) --- */
+/* Isso garante que o texto continue legível mesmo com a imagem colorida atrás */
 body::after {
     content: "";
     position: fixed;
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: -1;
-    background: var(--bg-gradient);
-    opacity: 0.5; /* Controla o quão escuro o fundo fica sobre a imagem */
+    background: var(--bg-overlay-gradient);
     pointer-events: none;
 }
 
 .container { width: 100%; max-width: 500px; position: relative; z-index: 1; }
 
 .calculator-card {
-    background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); 
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px); /* Suporte para Safari/iOS */
+    background: var(--card-bg); 
+    padding: 2rem; 
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg); 
+    border: 1px solid var(--border-color); 
+    
+    /* Efeito de desfoque no fundo do cartão para destacar o conteúdo */
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
 }
 
 .card-header { text-align: center; margin-bottom: 2rem; }
-.card-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+.card-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 .card-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
 
 /* Inputs */
@@ -104,7 +107,6 @@ body::after {
     border: 1px solid var(--border-color); border-radius: var(--radius-sm);
     font-family: 'Inter', sans-serif; font-size: 1rem;
     background: var(--input-bg); color: var(--text-main); transition: all 0.2s; outline: none;
-    /* Previne zoom automático no iPhone ao clicar */
     font-size: 16px; 
 }
 .currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
@@ -127,6 +129,7 @@ body::after {
 .statement-list {
     list-style: none; border: 1px solid var(--border-color);
     border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1.5rem;
+    background: rgba(15, 23, 42, 0.4); /* Fundo leve na lista */
 }
 .statement-item {
     display: flex; justify-content: space-between; padding: 0.75rem 1rem;
@@ -135,7 +138,7 @@ body::after {
 .statement-item:last-child { border-bottom: none; }
 .item-bruto .item-value { font-weight: 700; color: var(--text-main); }
 .item-desconto .item-value { color: var(--danger-color); }
-.item-subtotal { background-color: #334155; font-weight: 600; color: #fff; }
+.item-subtotal { background-color: rgba(59, 130, 246, 0.1); font-weight: 600; color: #fff; } /* Azul bem escuro */
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
 /* Devedor Card */
@@ -153,13 +156,13 @@ body::after {
 
 .select-btn {
     padding: 0.75rem; border-radius: var(--radius-sm);
-    background: transparent; border: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-color);
     color: var(--text-muted); font-weight: 600; cursor: pointer;
     transition: all 0.2s;
 }
-.select-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+.select-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
 .select-btn.active.pj-btn { background: var(--success-bg); border-color: var(--success-color); color: var(--success-color); }
-.select-btn.active.pf-btn { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); color: var(--primary-color); }
+.select-btn.active.pf-btn { background: rgba(59, 130, 246, 0.2); border-color: var(--primary-color); color: var(--primary-color); }
 
 /* PAINÉIS DE DETALHES */
 .detail-box {
@@ -169,7 +172,7 @@ body::after {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .pj-box { background: var(--success-bg); border-color: var(--success-color); }
-.pf-box { background: rgba(59, 130, 246, 0.1); border-color: var(--primary-color); }
+.pf-box { background: rgba(59, 130, 246, 0.15); border-color: var(--primary-color); }
 
 .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
@@ -181,7 +184,7 @@ body::after {
     padding: 0.5rem 0; 
     font-size: 0.9rem; 
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    color: var(--text-muted);
+    color: rgba(255,255,255,0.8);
 }
 .inner-list .val-neg { color: var(--danger-color); font-weight: 600; }
 .inner-list .val-pos { color: var(--text-main); font-weight: 600; }
