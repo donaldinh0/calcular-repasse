@@ -61,7 +61,6 @@ function calcularResultado() {
     // Valor Líquido Base (PJ)
     const valorLiquidoFinal = valorAtual; 
 
-    // Renderiza a lista comum
     document.getElementById('statementList').innerHTML = extratoHTML;
 
     // Controle de Exibição
@@ -73,16 +72,15 @@ function calcularResultado() {
     resultsSection.classList.remove('hidden');
 
     if (valorLiquidoFinal < 0) {
-        // Devedor
+        // Devedor: Usamos Math.abs para tirar o sinal de menos
         negativeContainer.classList.remove('hidden');
         positiveSelectionContainer.classList.add('hidden');
-        document.getElementById('valDevedorFinal').textContent = formatarMoeda(valorLiquidoFinal);
+        document.getElementById('valDevedorFinal').textContent = formatarMoeda(Math.abs(valorLiquidoFinal));
     } else {
         // Positivo
         negativeContainer.classList.add('hidden');
         positiveSelectionContainer.classList.remove('hidden');
 
-        // PREPARA OS DADOS DETALHADOS (Passamos os valores originais para recalcular o visual)
         prepararDadosPJ(getInputValue('resultadoMensal'), saldoDevedor);
         prepararDadosPF(getInputValue('resultadoMensal'), saldoDevedor);
     }
@@ -134,9 +132,7 @@ function prepararDadosPF(brutoInicial, dividaInicial) {
     }
 
     // 2. Adiciona RPA e ISS
-    // O valor base para RPA é o líquido atual (corrente)
     const baseRPA = corrente;
-    
     const valRPA = baseRPA * TAXAS.rpa;
     const valISS = baseRPA * TAXAS.iss;
     
@@ -156,7 +152,6 @@ function resetSelection() {
     document.getElementById('btnSelectPF').classList.remove('active');
 }
 
-// Cria linha da lista principal (cinza)
 function criarLinha(label, valor, tipo) {
     return `
         <li class="statement-item item-${tipo}">
@@ -166,7 +161,6 @@ function criarLinha(label, valor, tipo) {
     `;
 }
 
-// Cria linha da lista interna dos cards (transparente)
 function criarItemInner(label, valor, tipoClass) {
     return `
         <li>

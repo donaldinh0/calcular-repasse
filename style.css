@@ -138,7 +138,7 @@ body::before {
 .detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
 .detail-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.4; }
 
-/* NOVA CLASSE: LISTA INTERNA DOS CARDS */
+/* LISTA INTERNA DOS CARDS */
 .inner-list { list-style: none; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
 .inner-list li { 
     display: flex; justify-content: space-between; 
