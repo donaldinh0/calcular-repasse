@@ -63,7 +63,7 @@ body::before {
     background-repeat: no-repeat;
 
     /* AQUI ESTÁ A MÁGICA DO DESTAQUE */
-    opacity: 90%; /* Aumentado para 40% de visibilidade */
+    opacity: none; /* Aumentado para 40% de visibilidade */
     filter: none; /* Sem filtro de cinza = Cores originais */
 }
 
