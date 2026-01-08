@@ -11,13 +11,10 @@
     --danger-color: #f87171;
     --danger-bg: rgba(248, 113, 113, 0.1);
     
-    /* Fundo Sólido (Segurança para Mobile) */
     --bg-solid: #0f172a; 
-    
-    /* Gradiente que vai por cima da imagem (Vidro Fumê) */
     --bg-overlay-gradient: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 100%);
     
-    --card-bg: rgba(30, 41, 59, 0.7); /* Cartão mais translúcido para integrar com o fundo */
+    --card-bg: rgba(30, 41, 59, 0.7); 
     
     --text-main: #f1f5f9;
     --text-muted: #94a3b8;
@@ -32,10 +29,7 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html {
-    background-color: var(--bg-solid);
-    min-height: 100%;
-}
+html { background-color: var(--bg-solid); min-height: 100%; }
 
 body {
     font-family: 'Inter', sans-serif;
@@ -50,46 +44,24 @@ body {
     overflow-x: hidden;
 }
 
-/* --- CAMADA 1: A IMAGEM (Fundo) --- */
 body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -2;
-
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
     background-image: var(--bg-image-url);
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-
-    /* AQUI ESTÁ A MÁGICA DO DESTAQUE */
-    opacity: none; /* Aumentado para 40% de visibilidade */
-    filter: none; /* Sem filtro de cinza = Cores originais */
+    background-size: cover; background-position: center center; background-repeat: no-repeat;
+    opacity: 0.4; filter: none; 
 }
 
-/* --- CAMADA 2: O FILTRO ESCURO (Vidro) --- */
-/* Isso garante que o texto continue legível mesmo com a imagem colorida atrás */
 body::after {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: -1;
-    background: var(--bg-overlay-gradient);
-    pointer-events: none;
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background: var(--bg-overlay-gradient); pointer-events: none;
 }
 
 .container { width: 100%; max-width: 500px; position: relative; z-index: 1; }
 
 .calculator-card {
-    background: var(--card-bg); 
-    padding: 2rem; 
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg); 
-    border: 1px solid var(--border-color); 
-    
-    /* Efeito de desfoque no fundo do cartão para destacar o conteúdo */
-    backdrop-filter: blur(12px); 
-    -webkit-backdrop-filter: blur(12px);
+    background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); 
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 
 .card-header { text-align: center; margin-bottom: 2rem; }
@@ -111,6 +83,45 @@ body::after {
 }
 .currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
 
+/* --- NOVO: Link "Não sei meu saldo" --- */
+.unknown-balance-container {
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.unknown-link {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+.unknown-link:hover { opacity: 1; }
+
+/* Tooltip do Saldo (Específico) */
+.tooltip-balance {
+    width: 100%; /* Ocupa a largura do input */
+    top: 100%; /* Embaixo do link */
+    left: 0;
+    margin-top: 5px;
+    transform: none; /* Remove centralização padrão */
+    z-index: 50;
+    font-size: 0.8rem !important;
+}
+
+.email-link {
+    color: var(--success-color);
+    font-weight: 700;
+    text-decoration: none;
+}
+.email-link:hover { text-decoration: underline; }
+
+.unknown-balance-container:hover .tooltip-balance {
+    visibility: visible; opacity: 1;
+}
+
 /* Botão Principal */
 .cta-button {
     width: 100%; padding: 1rem; margin-top: 1rem; background: var(--primary-gradient);
@@ -129,7 +140,7 @@ body::after {
 .statement-list {
     list-style: none; border: 1px solid var(--border-color);
     border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1.5rem;
-    background: rgba(15, 23, 42, 0.4); /* Fundo leve na lista */
+    background: rgba(15, 23, 42, 0.4); 
 }
 .statement-item {
     display: flex; justify-content: space-between; padding: 0.75rem 1rem;
@@ -138,7 +149,7 @@ body::after {
 .statement-item:last-child { border-bottom: none; }
 .item-bruto .item-value { font-weight: 700; color: var(--text-main); }
 .item-desconto .item-value { color: var(--danger-color); }
-.item-subtotal { background-color: rgba(59, 130, 246, 0.1); font-weight: 600; color: #fff; } /* Azul bem escuro */
+.item-subtotal { background-color: rgba(59, 130, 246, 0.1); font-weight: 600; color: #fff; } 
 .item-subtotal .item-label { font-style: italic; opacity: 0.9; }
 
 /* Devedor Card */
@@ -193,7 +204,7 @@ body::after {
 .final-value-row span { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; color: var(--text-main); }
 .final-value-row strong { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
 
-/* Tooltip Mobile */
+/* Tooltip Geral e Mobile */
 .tooltip-container { position: relative; display: inline-block; }
 .help-icon {
     display: inline-flex; justify-content: center; align-items: center;
@@ -209,57 +220,39 @@ body::after {
     background-color: #0f172a; color: #e2e8f0;
     text-align: left; border-radius: 8px; padding: 12px;
     position: absolute; z-index: 100;
-    top: 100%; right: 0; margin-top: 10px;
     font-size: 0.75rem; line-height: 1.4; font-weight: 400;
     box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
     opacity: 0; transition: opacity 0.3s;
 }
-.tooltip-text::after { content: ""; position: absolute; bottom: 100%; right: 5px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--border-color) transparent; }
+
+/* Tooltip Padrão (do RPA) */
+.tooltip-container .tooltip-text { top: 100%; right: 0; margin-top: 10px; }
+.tooltip-container .tooltip-text::after { content: ""; position: absolute; bottom: 100%; right: 5px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--border-color) transparent; }
+
 .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
 .tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
 
-@media (max-width: 500px) {
-    .calculator-card { padding: 1.5rem; }
-    .tooltip-text { width: 220px; right: -10px; }
-}
-
-/* =========================================
-   AJUSTES ESPECÍFICOS PARA MOBILE (Telas pequenas)
-========================================= */
+/* Ajustes Mobile */
 @media (max-width: 768px) {
-
-    /* 1. A Imagem de Fundo (body::before) */
+    /* Imagem de Fundo Mobile */
     body::before {
-        opacity: 1 !important; /* Imagem com força total */
-        filter: none !important; /* Cores originais */
-        
+        opacity: 1 !important; 
+        filter: none !important; 
         background-size: cover !important;
-        
-        /* --- AQUI ESTÁ A MUDANÇA DE POSIÇÃO --- */
-        /* O primeiro valor (15%) move o foco para a esquerda. */
-        /* O segundo valor (35%) move o foco um pouco para cima. */
-        /* Tente ajustar esses números se precisar: (0% = esquerda/topo, 100% = direita/base) */
-        background-position: 90% 100% !important;
-        
+        background-position: 15% 35% !important;
         background-attachment: scroll !important;
     }
+    body::after { opacity: 0.4 !important; }
 
-    /* 2. O Filtro Escuro (body::after) */
-    body::after {
-        /* Deixa o filtro mais suave para a imagem aparecer bem */
-        opacity: 0.4 !important; 
-    }
-
-    /* 3. Ajuste de segurança no cartão */
     .calculator-card {
         backdrop-filter: blur(15px) !important;
         -webkit-backdrop-filter: blur(15px) !important;
-        background: rgba(30, 41, 59, 0.85) !important; /* Fundo um pouco mais sólido para leitura */
-        padding: 1.5rem !important; /* Reduz um pouco o padding interno no mobile para ganhar espaço */
+        background: rgba(30, 41, 59, 0.85) !important; 
+        padding: 1.5rem !important; 
     }
-    
-    /* Ajuste extra para o contêiner no mobile */
-    .container {
-        width: 95% !important; /* Ocupa quase toda a largura */
-    }
+    .container { width: 95% !important; }
+}
+
+@media (max-width: 500px) {
+    .tooltip-text { width: 220px; right: -10px; }
 }

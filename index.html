@@ -33,6 +33,14 @@
                         <span class="currency-symbol">R$</span>
                         <input type="text" id="saldoDevedor" class="money-input" placeholder="0,00" inputmode="numeric">
                     </div>
+                    
+                    <div class="unknown-balance-container">
+                        <span id="btnUnknownBalance" class="unknown-link">Não sei meu saldo devedor</span>
+                        <div class="tooltip-text tooltip-balance">
+                            Caso não souber o seu saldo devedor correto, envie um e-mail para nossa mesa perguntando: <br>
+                            <a href="mailto:suporte@tsrtrading.com.br" class="email-link">suporte@tsrtrading.com.br</a>
+                        </div>
+                    </div>
                 </div>
 
                 <button id="btnCalcular" class="cta-button">Calcular</button>
@@ -57,9 +65,7 @@
 
                 <div id="positiveSelectionContainer" class="hidden">
                     
-                    <h3 class="selection-title">Parabéns! Você tem repasses à receber.</h3>
-                    <h3 class="selection-title">Selecione o seu tipo de Contrato:</h3>
-
+                    <h3 class="selection-title">Selecione o Contrato:</h3>
                     
                     <div class="selection-buttons">
                         <button id="btnSelectPJ" class="select-btn pj-btn">Contrato PJ</button>
@@ -103,6 +109,13 @@
             </section>
         </div>
     </main>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calculadora TSR">
+    <link rel="apple-touch-icon" href="icon.png">
 
     <script src="script.js"></script>
 </body>

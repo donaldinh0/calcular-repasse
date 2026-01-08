@@ -72,7 +72,7 @@ function calcularResultado() {
     resultsSection.classList.remove('hidden');
 
     if (valorLiquidoFinal < 0) {
-        // Devedor: Usamos Math.abs para tirar o sinal de menos
+        // Devedor
         negativeContainer.classList.remove('hidden');
         positiveSelectionContainer.classList.add('hidden');
         document.getElementById('valDevedorFinal').textContent = formatarMoeda(Math.abs(valorLiquidoFinal));
@@ -115,7 +115,6 @@ function prepararDadosPF(brutoInicial, dividaInicial) {
     let html = '';
     let corrente = brutoInicial;
 
-    // 1. Refaz o caminho básico
     html += criarItemInner("Resultado Mensal", corrente, "pos");
 
     const ir = brutoInicial * TAXAS.ir;
@@ -131,7 +130,6 @@ function prepararDadosPF(brutoInicial, dividaInicial) {
         html += criarItemInner("(-) Saldo Devedor", -dividaInicial, "neg");
     }
 
-    // 2. Adiciona RPA e ISS
     const baseRPA = corrente;
     const valRPA = baseRPA * TAXAS.rpa;
     const valISS = baseRPA * TAXAS.iss;
@@ -199,7 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
         detailsPF.classList.remove('hidden');
     });
 
-    // Tooltip Mobile
+    // Tooltip RPA (Mobile)
     const btnHelp = document.getElementById('btnHelp');
     if (btnHelp) {
         btnHelp.addEventListener('click', (e) => {
@@ -209,6 +207,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- NOVO: Tooltip "Não sei meu saldo" (Mobile) ---
+    const btnUnknown = document.getElementById('btnUnknownBalance');
+    if (btnUnknown) {
+        btnUnknown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const tooltip = btnUnknown.nextElementSibling; // div.tooltip-balance
+            if(tooltip) tooltip.classList.toggle('show-tooltip');
+        });
+    }
+
+    // Fecha tooltips ao clicar fora
     document.addEventListener('click', () => {
         const allTooltips = document.querySelectorAll('.tooltip-text');
         allTooltips.forEach(t => t.classList.remove('show-tooltip'));
