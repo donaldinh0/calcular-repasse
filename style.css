@@ -241,7 +241,7 @@ body::after {
         background-size: cover !important;
         
         /* Tenta centralizar o foco da imagem */
-        background-position: center center !important;
+        background-position: top top !important;
         
         /* 'scroll' no mobile às vezes funciona melhor que 'fixed' para evitar pulos no iOS */
         background-attachment: scroll !important;
