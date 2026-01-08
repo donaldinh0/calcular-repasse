@@ -222,3 +222,45 @@ body::after {
     .calculator-card { padding: 1.5rem; }
     .tooltip-text { width: 220px; right: -10px; }
 }
+
+/* =========================================
+   AJUSTES ESPECÍFICOS PARA MOBILE (Telas pequenas)
+========================================= */
+@media (max-width: 768px) {
+
+    /* 1. A Imagem de Fundo (body::before) */
+    body::before {
+        /* Tira a transparência, deixando a imagem 100% vívida */
+        opacity: 1 !important; 
+        /* Garante cores reais */
+        filter: none !important; 
+        
+        /* 'cover' garante que preencha a tela toda. 
+           Nota: Para preencher sem distorcer, ele sempre vai cortar 
+           um pouquinho das bordas dependendo do formato do celular. */
+        background-size: cover !important;
+        
+        /* Tenta centralizar o foco da imagem */
+        background-position: center center !important;
+        
+        /* 'scroll' no mobile às vezes funciona melhor que 'fixed' para evitar pulos no iOS */
+        background-attachment: scroll !important;
+    }
+
+    /* 2. O Filtro Escuro (body::after) */
+    /* Como a imagem agora está forte, precisamos suavizar o filtro escuro 
+       que fica por cima dela, senão tudo fica muito preto. */
+    body::after {
+        /* Reduz a força do gradiente escuro que fica sobre a imagem */
+        opacity: 0.5 !important; /* Ajuste entre 0.3 (mais claro) e 0.7 (mais escuro) se precisar */
+    }
+
+    /* 3. Ajuste de segurança no cartão */
+    /* Garante que o cartão ainda seja legível sobre a imagem forte */
+    .calculator-card {
+         /* Um pouco mais de desfoque e cor no fundo do cartão */
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        background: rgba(30, 41, 59, 0.8) !important; 
+    }
+}
