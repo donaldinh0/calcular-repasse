@@ -230,37 +230,36 @@ body::after {
 
     /* 1. A Imagem de Fundo (body::before) */
     body::before {
-        /* Tira a transparência, deixando a imagem 100% vívida */
-        opacity: 1 !important; 
-        /* Garante cores reais */
-        filter: none !important; 
+        opacity: 1 !important; /* Imagem com força total */
+        filter: none !important; /* Cores originais */
         
-        /* 'cover' garante que preencha a tela toda. 
-           Nota: Para preencher sem distorcer, ele sempre vai cortar 
-           um pouquinho das bordas dependendo do formato do celular. */
         background-size: cover !important;
         
-        /* Tenta centralizar o foco da imagem */
-        background-position: top top !important;
+        /* --- AQUI ESTÁ A MUDANÇA DE POSIÇÃO --- */
+        /* O primeiro valor (15%) move o foco para a esquerda. */
+        /* O segundo valor (35%) move o foco um pouco para cima. */
+        /* Tente ajustar esses números se precisar: (0% = esquerda/topo, 100% = direita/base) */
+        background-position: 15% 35% !important;
         
-        /* 'scroll' no mobile às vezes funciona melhor que 'fixed' para evitar pulos no iOS */
         background-attachment: scroll !important;
     }
 
     /* 2. O Filtro Escuro (body::after) */
-    /* Como a imagem agora está forte, precisamos suavizar o filtro escuro 
-       que fica por cima dela, senão tudo fica muito preto. */
     body::after {
-        /* Reduz a força do gradiente escuro que fica sobre a imagem */
-        opacity: 0.5 !important; /* Ajuste entre 0.3 (mais claro) e 0.7 (mais escuro) se precisar */
+        /* Deixa o filtro mais suave para a imagem aparecer bem */
+        opacity: 0.4 !important; 
     }
 
     /* 3. Ajuste de segurança no cartão */
-    /* Garante que o cartão ainda seja legível sobre a imagem forte */
     .calculator-card {
-         /* Um pouco mais de desfoque e cor no fundo do cartão */
         backdrop-filter: blur(15px) !important;
         -webkit-backdrop-filter: blur(15px) !important;
-        background: rgba(30, 41, 59, 0.8) !important; 
+        background: rgba(30, 41, 59, 0.85) !important; /* Fundo um pouco mais sólido para leitura */
+        padding: 1.5rem !important; /* Reduz um pouco o padding interno no mobile para ganhar espaço */
+    }
+    
+    /* Ajuste extra para o contêiner no mobile */
+    .container {
+        width: 95% !important; /* Ocupa quase toda a largura */
     }
 }
