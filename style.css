@@ -239,7 +239,7 @@ body::after {
         /* O primeiro valor (15%) move o foco para a esquerda. */
         /* O segundo valor (35%) move o foco um pouco para cima. */
         /* Tente ajustar esses números se precisar: (0% = esquerda/topo, 100% = direita/base) */
-        background-position: 90% 90% !important;
+        background-position: 90% 1% !important;
         
         background-attachment: scroll !important;
     }
