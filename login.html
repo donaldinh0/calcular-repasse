@@ -3,141 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acesso Restrito - TSR Investimentos</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Acesso Restrito - TSR</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        /* --- DESIGN SYSTEM TSR (Igual da Calculadora) --- */
-        :root {
-            /* Copie a imagem tsr1.jpg para a mesma pasta do login.html */
-            --bg-image: url('tsr1.jpg'); 
-            
-            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            --glass-bg: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --input-bg: rgba(15, 23, 42, 0.6);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --danger: #ef4444;
-            --success: #10b981;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #0f172a;
-            color: var(--text-main);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Fundo com Imagem e Overlay Escuro */
-        body::before {
-            content: ''; position: absolute; inset: 0;
-            background-image: var(--bg-image);
-            background-size: cover; background-position: center;
-            opacity: 0.4; z-index: -2;
-        }
-        body::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(to bottom, rgba(15,23,42,0.8), rgba(15,23,42,0.95));
-            z-index: -1;
-        }
-
-        /* Card de Vidro (Glassmorphism) */
-        .login-card {
-            width: 100%;
-            max-width: 400px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 2.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
-        .header p { color: var(--text-muted); font-size: 0.9rem; }
-
-        .form-group { margin-bottom: 1.25rem; }
-        .form-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-muted); }
-        
-        input {
-            width: 100%;
-            padding: 0.85rem 1rem;
-            background: var(--input-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-            transition: all 0.2s;
-            outline: none;
-        }
-        input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
-
-        .btn-primary {
-            width: 100%;
-            padding: 0.9rem;
-            background: var(--primary-gradient);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            margin-top: 0.5rem;
-        }
-        .btn-primary:hover { opacity: 0.9; }
-        .btn-primary:active { transform: scale(0.98); }
-
-        .footer-links { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; }
-        .link { color: #60a5fa; text-decoration: none; cursor: pointer; transition: color 0.2s; }
-        .link:hover { color: #93c5fd; text-decoration: underline; }
-
-        .message-box {
-            margin-top: 1rem;
-            padding: 0.75rem;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            text-align: center;
-            display: none; /* Escondido por padrão */
-        }
-        .msg-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .msg-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.2); }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Ajuste Mobile */
-        @media (max-width: 480px) {
-            .login-card { padding: 1.5rem; background: rgba(15, 23, 42, 0.9); border: none; }
-        }
-    </style>
 </head>
 <body>
 
     <div class="login-card">
-        <div class="header">
+        <div class="card-header">
             <h1 id="title">Acesso Restrito</h1>
             <p id="subtitle">Faça login para utilizar a calculadora</p>
         </div>
 
-        <div class="form-group">
-            <label>E-mail</label>
+        <div class="input-group">
+            <label>E-mail Corporativo</label>
             <input type="email" id="email" placeholder="nome@tsr.com.br" autocomplete="email">
         </div>
 
-        <div class="form-group">
+        <div class="input-group">
             <label>Senha</label>
             <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
         </div>
@@ -154,13 +38,12 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // --- CONFIG ---
+            // --- CONFIGURAÇÃO DO SUPABASE ---
             const SUPABASE_URL = 'https://aytwhfiovgyzieblsthn.supabase.co'; 
             const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHdoZmlvdmd5emllYmxzdGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDY3OTYsImV4cCI6MjA4MzkyMjc5Nn0.qFS_EZT7V9Z5PngraXvdrvpsZCcELnxIC51ab8RZn40'; 
             
             const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-            // --- VARIAVEIS ---
             let isLogin = true;
             const ui = {
                 title: document.getElementById('title'),
@@ -173,11 +56,9 @@
                 pass: document.getElementById('password')
             };
 
-            // --- FUNÇÃO DE ALTERNAR MODO ---
+            // Alternar Login/Cadastro
             ui.toggle.addEventListener('click', () => {
                 isLogin = !isLogin;
-                
-                // Animação suave
                 ui.msg.style.display = 'none';
                 
                 if(isLogin) {
@@ -195,7 +76,7 @@
                 }
             });
 
-            // --- FUNÇÃO DE AÇÃO (LOGIN/CADASTRO) ---
+            // Botão de Ação
             ui.btn.addEventListener('click', async () => {
                 const email = ui.email.value.trim();
                 const password = ui.pass.value.trim();
@@ -206,15 +87,13 @@
                 }
 
                 ui.btn.innerText = "Processando...";
-                ui.btn.style.opacity = "0.7";
-                
                 let result = null;
 
                 if(isLogin) {
                     // LOGIN
                     result = await supabaseClient.auth.signInWithPassword({ email, password });
                     if(!result.error) {
-                        window.location.href = '/'; // Sucesso!
+                        window.location.href = '/'; // Vai para a home (index.html)
                         return;
                     }
                 } else {
@@ -222,30 +101,23 @@
                     result = await supabaseClient.auth.signUp({ email, password });
                     if(!result.error) {
                         showMsg("Sucesso! Conta criada. Faça login para entrar.", "success");
-                        setTimeout(() => ui.toggle.click(), 2000); // Volta pro login sozinho
+                        setTimeout(() => ui.toggle.click(), 2000);
                     }
                 }
 
-                // TRATAMENTO DE ERRO
+                // Erros
                 if(result.error) {
-                    console.log(result.error);
                     const msg = result.error.message;
-                    
                     if(msg.includes("Database error") || msg.includes("authorized")) {
                         showMsg("⛔ Acesso Negado: E-mail não consta na lista de sócios.", "error");
                     } else if (msg.includes("Invalid login")) {
                         showMsg("E-mail ou senha incorretos.", "error");
                     } else if (msg.includes("already registered")) {
                         showMsg("Este e-mail já possui cadastro.", "error");
-                    } else if (msg.includes("weak password")) {
-                        showMsg("A senha deve ter pelo menos 6 caracteres.", "error");
                     } else {
                         showMsg("Erro: " + msg, "error");
                     }
                 }
-
-                // Restaura botão
-                ui.btn.style.opacity = "1";
                 ui.btn.innerText = isLogin ? "Entrar no Sistema" : "Confirmar Cadastro";
             });
 
