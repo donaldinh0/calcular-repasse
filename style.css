@@ -1,133 +1,258 @@
-/* --- VARIAVEIS GLOBAIS (Tema TSR) --- */
 :root {
-    --bg-image: url('tsr1.jpg'); /* Certifique-se que a imagem está na pasta */
+    --bg-image-url: url('tsr1.jpg');
+
+    /* --- Paleta Dark Mode --- */
+    --primary-color: #3b82f6;
     --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    --glass-bg: rgba(30, 41, 59, 0.7);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --input-bg: rgba(15, 23, 42, 0.6);
-    --text-main: #f8fafc;
+    
+    --success-color: #4ade80;
+    --success-bg: rgba(74, 222, 128, 0.1);
+    
+    --danger-color: #f87171;
+    --danger-bg: rgba(248, 113, 113, 0.1);
+    
+    --bg-solid: #0f172a; 
+    --bg-overlay-gradient: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(30, 41, 59, 0.85) 100%);
+    
+    --card-bg: rgba(30, 41, 59, 0.7); 
+    
+    --text-main: #f1f5f9;
     --text-muted: #94a3b8;
-    --danger: #ef4444;
-    --success: #10b981;
+    
+    --border-color: rgba(51, 65, 85, 0.6);
+    --input-bg: rgba(15, 23, 42, 0.8);
+    
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-lg: 0 10px 30px -5px rgba(0, 0, 0, 0.6), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { background-color: var(--bg-solid); min-height: 100%; }
 
 body {
+    font-family: 'Inter', sans-serif;
+    background-color: transparent;
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    background-color: #0f172a;
-    color: var(--text-main);
+    align-items: center;
+    padding: 20px;
     position: relative;
-    overflow: hidden; /* Evita rolagem desnecessária */
+    overflow-x: hidden;
 }
 
-/* Fundo com Imagem e Overlay */
 body::before {
-    content: ''; position: absolute; inset: 0;
-    background-image: var(--bg-image);
-    background-size: cover; background-position: center;
-    opacity: 0.4; z-index: -2;
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+    background-image: var(--bg-image-url);
+    background-size: cover; background-position: center center; background-repeat: no-repeat;
+    opacity: 0.4; filter: none; 
 }
+
 body::after {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(15,23,42,0.8), rgba(15,23,42,0.95));
-    z-index: -1;
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+    background: var(--bg-overlay-gradient); pointer-events: none;
 }
 
-/* --- CARD PRINCIPAL (Vidro) --- */
-.calculator-card, .login-card {
-    position: relative; /* Necessário para o botão de sair */
-    width: 100%;
-    max-width: 420px;
-    background: var(--glass-bg);
+.container { width: 100%; max-width: 500px; position: relative; z-index: 1; }
+
+.calculator-card {
+    background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg); border: 1px solid var(--border-color); 
     backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    padding: 2.5rem;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.6s ease-out;
 }
 
-/* --- TIPOGRAFIA --- */
 .card-header { text-align: center; margin-bottom: 2rem; }
-.card-header h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.5px; }
-.card-header p { color: var(--text-muted); font-size: 0.9rem; }
+.card-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--text-main); text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.card-header p { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.25rem; }
 
-/* --- INPUTS --- */
+/* Inputs */
 .input-group { margin-bottom: 1.25rem; }
-.input-group label { display: block; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-muted); }
+.input-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.9rem; color: var(--text-muted); }
 
-input {
-    width: 100%;
-    padding: 0.85rem 1rem;
-    background: var(--input-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    color: white;
-    font-size: 1rem;
+.currency-wrapper { position: relative; display: flex; align-items: center; }
+.currency-symbol { position: absolute; left: 1rem; color: var(--text-muted); font-weight: 500; }
+.currency-wrapper input {
+    width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--border-color); border-radius: var(--radius-sm);
+    font-family: 'Inter', sans-serif; font-size: 1rem;
+    background: var(--input-bg); color: var(--text-main); transition: all 0.2s; outline: none;
+    font-size: 16px; 
+}
+.currency-wrapper input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+/* --- NOVO: Link "Não sei meu saldo" --- */
+.unknown-balance-container {
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.unknown-link {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    text-decoration: underline;
+    cursor: pointer;
+    font-weight: 500;
+    opacity: 0.9;
+    transition: opacity 0.2s;
+}
+.unknown-link:hover { opacity: 1; }
+
+/* Tooltip do Saldo (Específico) */
+.tooltip-balance {
+    width: 100%; /* Ocupa a largura do input */
+    top: 100%; /* Embaixo do link */
+    left: 0;
+    margin-top: 5px;
+    transform: none; /* Remove centralização padrão */
+    z-index: 50;
+    font-size: 0.8rem !important;
+}
+
+.email-link {
+    color: var(--success-color);
+    font-weight: 700;
+    text-decoration: none;
+}
+.email-link:hover { text-decoration: underline; }
+
+.unknown-balance-container:hover .tooltip-balance {
+    visibility: visible; opacity: 1;
+}
+
+/* Botão Principal */
+.cta-button {
+    width: 100%; padding: 1rem; margin-top: 1rem; background: var(--primary-gradient);
+    color: white; border: none; border-radius: var(--radius-sm);
+    font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;
+    cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+.cta-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6); filter: brightness(1.1); }
+.cta-button:active { transform: translateY(1px); box-shadow: 0 2px 10px rgba(59, 130, 246, 0.4); }
+
+/* Resultados */
+.hidden { display: none !important; }
+.separator { height: 1px; background: var(--border-color); margin: 1.5rem 0; }
+.results-header h2 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 1rem; }
+
+.statement-list {
+    list-style: none; border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1.5rem;
+    background: rgba(15, 23, 42, 0.4); 
+}
+.statement-item {
+    display: flex; justify-content: space-between; padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color); font-size: 0.9rem;
+}
+.statement-item:last-child { border-bottom: none; }
+.item-bruto .item-value { font-weight: 700; color: var(--text-main); }
+.item-desconto .item-value { color: var(--danger-color); }
+.item-subtotal { background-color: rgba(59, 130, 246, 0.1); font-weight: 600; color: #fff; } 
+.item-subtotal .item-label { font-style: italic; opacity: 0.9; }
+
+/* Devedor Card */
+.final-result-card {
+    text-align: center; padding: 1.5rem;
+    border: 1px solid var(--border-color); border-radius: var(--radius-md); background: transparent;
+}
+.final-label { display: block; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600; }
+.final-result-card strong { display: block; font-size: 1.75rem; font-weight: 800; }
+.text-red { color: var(--danger-color) !important; border-color: var(--danger-color) !important; background: var(--danger-bg) !important; }
+
+/* SELEÇÃO DE CONTRATO */
+.selection-title { font-size: 1rem; color: var(--text-main); text-align: center; margin-bottom: 1rem; font-weight: 600; }
+.selection-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+
+.select-btn {
+    padding: 0.75rem; border-radius: var(--radius-sm);
+    background: rgba(15, 23, 42, 0.5); border: 1px solid var(--border-color);
+    color: var(--text-muted); font-weight: 600; cursor: pointer;
     transition: all 0.2s;
-    outline: none;
 }
-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+.select-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-main); }
+.select-btn.active.pj-btn { background: var(--success-bg); border-color: var(--success-color); color: var(--success-color); }
+.select-btn.active.pf-btn { background: rgba(59, 130, 246, 0.2); border-color: var(--primary-color); color: var(--primary-color); }
 
-/* --- BOTÕES --- */
-.cta-button, .btn-primary {
-    width: 100%;
-    padding: 0.9rem;
-    background: var(--primary-gradient);
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-    margin-top: 1rem;
-    font-size: 1rem;
+/* PAINÉIS DE DETALHES */
+.detail-box {
+    padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);
+    animation: fadeIn 0.3s ease-in-out;
 }
-.cta-button:hover, .btn-primary:hover { opacity: 0.9; }
-.cta-button:active, .btn-primary:active { transform: scale(0.98); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* --- BOTÃO DE LOGOUT (NOVO) --- */
-.btn-logout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 5px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
+.pj-box { background: var(--success-bg); border-color: var(--success-color); }
+.pf-box { background: rgba(59, 130, 246, 0.15); border-color: var(--primary-color); }
+
+.detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.detail-header span { font-weight: 700; font-size: 1.1rem; color: var(--text-main); }
+
+/* LISTA INTERNA DOS CARDS */
+.inner-list { list-style: none; margin-bottom: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
+.inner-list li { 
+    display: flex; justify-content: space-between; 
+    padding: 0.5rem 0; 
+    font-size: 0.9rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.8);
 }
-.btn-logout:hover {
-    color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-    transform: translateX(2px);
+.inner-list .val-neg { color: var(--danger-color); font-weight: 600; }
+.inner-list .val-pos { color: var(--text-main); font-weight: 600; }
+
+.final-value-row { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 2px solid rgba(255,255,255,0.1); }
+.final-value-row span { font-size: 0.9rem; text-transform: uppercase; font-weight: 600; color: var(--text-main); }
+.final-value-row strong { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+
+/* Tooltip Geral e Mobile */
+.tooltip-container { position: relative; display: inline-block; }
+.help-icon {
+    display: inline-flex; justify-content: center; align-items: center;
+    width: 20px; height: 20px;
+    background: rgba(255,255,255,0.1); color: var(--text-main);
+    border-radius: 50%; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.help-icon:hover { background: var(--primary-color); color: white; }
+
+.tooltip-text {
+    visibility: hidden; width: 250px;
+    background-color: #0f172a; color: #e2e8f0;
+    text-align: left; border-radius: 8px; padding: 12px;
+    position: absolute; z-index: 100;
+    font-size: 0.75rem; line-height: 1.4; font-weight: 400;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5); border: 1px solid var(--border-color);
+    opacity: 0; transition: opacity 0.3s;
 }
 
-/* --- LINKS E MENSAGENS --- */
-.footer-links { margin-top: 1.5rem; text-align: center; font-size: 0.85rem; }
-.link { color: #60a5fa; text-decoration: none; cursor: pointer; }
-.link:hover { text-decoration: underline; }
+/* Tooltip Padrão (do RPA) */
+.tooltip-container .tooltip-text { top: 100%; right: 0; margin-top: 10px; }
+.tooltip-container .tooltip-text::after { content: ""; position: absolute; bottom: 100%; right: 5px; border-width: 6px; border-style: solid; border-color: transparent transparent var(--border-color) transparent; }
 
-.message-box {
-    margin-top: 1rem; padding: 0.75rem; border-radius: 8px;
-    font-size: 0.85rem; text-align: center; display: none;
+.tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+.tooltip-text.show-tooltip { visibility: visible; opacity: 1; }
+
+/* Ajustes Mobile */
+@media (max-width: 768px) {
+    /* Imagem de Fundo Mobile */
+    body::before {
+        opacity: 1 !important; 
+        filter: none !important; 
+        background-size: cover !important;
+        background-position: 15% 35% !important;
+        background-attachment: scroll !important;
+    }
+    body::after { opacity: 0.4 !important; }
+
+    .calculator-card {
+        backdrop-filter: blur(15px) !important;
+        -webkit-backdrop-filter: blur(15px) !important;
+        background: rgba(30, 41, 59, 0.85) !important; 
+        padding: 1.5rem !important; 
+    }
+    .container { width: 95% !important; }
 }
-.msg-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.2); }
-.msg-success { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.2); }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-/* Mobile */
-@media (max-width: 480px) {
-    .calculator-card, .login-card { padding: 1.5rem; border: none; background: rgba(15, 23, 42, 0.9); }
+@media (max-width: 500px) {
+    .tooltip-text { width: 220px; right: -10px; }
 }

@@ -1,90 +1,143 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Repasse TSR</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <script>
-        const SUPABASE_URL = 'https://aytwhfiovgyzieblsthn.supabase.co'; 
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHdoZmlvdmd5emllYmxzdGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDY3OTYsImV4cCI6MjA4MzkyMjc5Nn0.qFS_EZT7V9Z5PngraXvdrvpsZCcELnxIC51ab8RZn40'; 
-        const supabaseCheck = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        async function checkSession() {
-            const { data: { session } } = await supabaseCheck.auth.getSession();
-            if (!session) {
-                window.location.href = '/'; // Chuta para fora se não tiver logado
-            }
-        }
-        checkSession();
-    </script>
 </head>
 <body>
 
-    <div class="calculator-card">
-        
-        <button id="btnLogout" class="btn-logout" title="Sair da conta">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                <polyline points="16 17 21 12 16 7"></polyline>
-                <line x1="21" y1="12" x2="9" y2="12"></line>
-            </svg>
-        </button>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Mesmas chaves do login (Idealmente coloque num arquivo config.js separado depois)
+    const SUPABASE_URL = 'https://aytwhfiovgyzieblsthn.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHdoZmlvdmd5emllYmxzdGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDY3OTYsImV4cCI6MjA4MzkyMjc5Nn0.qFS_EZT7V9Z5PngraXvdrvpsZCcELnxIC51ab8RZn40';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        <header class="card-header">
-            <h1>Calculadora de Repasse</h1>
-            <p>TSR Investimentos</p>
-        </header>
+    // Verifica sessão ao carregar
+    async function checkSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            // Se não tiver logado, chuta pro login
+            window.location.href = 'login.html';
+        }
+    }
+    checkSession();
+</script>
 
-        <div class="input-group">
-            <label>Valor Bruto (R$)</label>
-            <input type="number" id="valorBruto" placeholder="0,00">
+    <main class="container">
+        <div class="calculator-card">
+            <header class="card-header">
+                <h1>Calculadora de Repasse</h1>
+                <p>Simule seus ganhos detalhadamente.</p>
+            </header>
+
+            <section class="input-section">
+                <div class="input-group">
+                    <label for="resultadoMensal">Resultado Mensal</label>
+                    <div class="currency-wrapper">
+                        <span class="currency-symbol">R$</span>
+                        <input type="text" id="resultadoMensal" class="money-input" placeholder="0,00" inputmode="numeric">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="saldoDevedor">Saldo Devedor (Opcional)</label>
+                    <div class="currency-wrapper negative-hint">
+                        <span class="currency-symbol">R$</span>
+                        <input type="text" id="saldoDevedor" class="money-input" placeholder="0,00" inputmode="numeric">
+                    </div>
+                    
+                    <div class="unknown-balance-container">
+                        <span id="btnUnknownBalance" class="unknown-link">Não sei meu saldo devedor</span>
+                        <div class="tooltip-text tooltip-balance">
+                            Caso não souber o seu saldo devedor correto, envie um e-mail para nossa mesa perguntando: <br>
+                            <a href="mailto:suporte@tsrtrading.com.br" class="email-link">suporte@tsrtrading.com.br</a>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="btnCalcular" class="cta-button">Calcular</button>
+            </section>
+
+            <section id="resultsSection" class="results-section hidden">
+                <div class="separator"></div>
+                
+                <div class="results-header">
+                    <h2>Demonstrativo</h2>
+                </div>
+                
+                <ul id="statementList" class="statement-list">
+                   </ul>
+
+                <div id="negativeResultContainer" class="hidden">
+                    <div class="final-result-card text-red">
+                        <span class="final-label">Seu saldo devedor atual é de:</span>
+                        <strong id="valDevedorFinal">R$ 0,00</strong>
+                    </div>
+                </div>
+
+                <div id="positiveSelectionContainer" class="hidden">
+                    
+                    <h3 class="selection-title">Parabéns! Você possui repasse para receber.</h3>
+                    <h3 class="selection-title">Selecione o Contrato:</h3>
+
+                    
+                    <div class="selection-buttons">
+                        <button id="btnSelectPJ" class="select-btn pj-btn">Contrato PJ</button>
+                        <button id="btnSelectPF" class="select-btn pf-btn">Contrato PF</button>
+                    </div>
+
+                    <div id="detailsPJ" class="detail-box pj-box hidden">
+                        <div class="detail-header">
+                            <span>Resumo do Cálculo</span>
+                        </div>
+                        
+                        <ul id="listPJ" class="inner-list"></ul>
+                        
+                        <div class="final-value-row">
+                            <span>Valor Líquido:</span>
+                            <strong id="valFinalPJ">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                    <div id="detailsPF" class="detail-box pf-box hidden">
+                        <div class="detail-header">
+                            <span>Resumo PF</span>
+                            <div class="tooltip-container">
+                                <span class="help-icon" id="btnHelp">?</span>
+                                <div class="tooltip-text">
+                                    O RPA (Recibo de Pagamento Autônomo) formaliza pagamentos a autônomos. Inclui descontos de 11% (INSS) e 5% (ISS) sobre o valor líquido total.
+                                </div>
+                            </div>
+                        </div>
+
+                        <ul id="listPF" class="inner-list"></ul>
+                        
+                        <div class="final-value-row">
+                            <span>Valor Líquido:</span>
+                            <strong id="valFinalPF">R$ 0,00</strong>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
         </div>
+    </main>
 
-        <div class="input-group">
-            <label>Imposto (%)</label>
-            <input type="number" id="imposto" placeholder="Ex: 15" value="15">
-        </div>
-        
-        <button id="btnCalcular" class="cta-button">Calcular Repasse</button>
-        
-        <div id="resultado" style="margin-top: 20px; text-align: center; font-weight: bold; font-size: 1.2rem;"></div>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calculadora TSR">
+    <link rel="apple-touch-icon" href="icon.png">
 
-    </div>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Instância do Supabase para o Logout
-            const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-            // --- 1. LÓGICA DO BOTÃO DE SAIR ---
-            const btnLogout = document.getElementById('btnLogout');
-            if(btnLogout) {
-                btnLogout.addEventListener('click', async () => {
-                    await supabaseClient.auth.signOut();
-                    window.location.href = '/';
-                });
-            }
-
-            // --- 2. LÓGICA DA CALCULADORA ---
-            // (Reimplementei uma lógica básica aqui, ajuste conforme sua necessidade)
-            const btnCalcular = document.getElementById('btnCalcular');
-            const resultBox = document.getElementById('resultado');
-
-            btnCalcular.addEventListener('click', () => {
-                const valor = parseFloat(document.getElementById('valorBruto').value) || 0;
-                const tax = parseFloat(document.getElementById('imposto').value) || 0;
-
-                // Exemplo de cálculo: Valor - Imposto
-                const liquido = valor - (valor * (tax / 100));
-
-                resultBox.innerText = "Líquido: " + liquido.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                resultBox.style.color = "var(--success)";
-            });
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
