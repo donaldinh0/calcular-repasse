@@ -11,6 +11,24 @@
 </head>
 <body>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // Mesmas chaves do login (Idealmente coloque num arquivo config.js separado depois)
+    const SUPABASE_URL = 'https://aytwhfiovgyzieblsthn.supabase.co'; 
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5dHdoZmlvdmd5emllYmxzdGhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNDY3OTYsImV4cCI6MjA4MzkyMjc5Nn0.qFS_EZT7V9Z5PngraXvdrvpsZCcELnxIC51ab8RZn40';
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Verifica sessão ao carregar
+    async function checkSession() {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+            // Se não tiver logado, chuta pro login
+            window.location.href = 'login.html';
+        }
+    }
+    checkSession();
+</script>
+
     <main class="container">
         <div class="calculator-card">
             <header class="card-header">
