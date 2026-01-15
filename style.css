@@ -262,26 +262,3 @@ body::after {
     position: relative; /* Adicione essa linha se não tiver */
     /* ... o resto do seu estilo ... */
 }
-
-/* Estilo do Botão de Sair */
-.btn-logout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: transparent;
-    border: none;
-    color: var(--text-muted); /* Cor cinza discreta */
-    cursor: pointer;
-    transition: all 0.3s ease;
-    padding: 5px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.btn-logout:hover {
-    color: #ef4444; /* Fica vermelho (perigo) ao passar o mouse */
-    background: rgba(239, 68, 68, 0.1); /* Fundo vermelho bem fraquinho */
-    transform: translateX(2px); /* Efeito de movimento */
-}
