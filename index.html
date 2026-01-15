@@ -214,7 +214,7 @@
                     // LOGIN
                     result = await supabaseClient.auth.signInWithPassword({ email, password });
                     if(!result.error) {
-                        window.location.href = '/'; // Sucesso!
+                        window.location.href = 'sistema.html'; // Sucesso!
                         return;
                     }
                 } else {
